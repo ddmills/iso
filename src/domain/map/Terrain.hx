@@ -43,8 +43,8 @@ typedef IntPointThree =
 
 class Terrain
 {
-	public var width:Int = 100;
-	public var height:Int = 100;
+	public var width:Int = 64;
+	public var height:Int = 64;
 	public var depth:Int = 4;
 	public var ob:TerrainOb;
 
@@ -65,12 +65,11 @@ class Terrain
 			g.fill(EMPTY);
 			grids.push(g);
 		}
-		ob = new TerrainOb();
+		ob = new TerrainOb(this);
 	}
 
-	function screenToWorld(sx:Int, sy:Int, z:Int):IntPointThree
+	function screenToWorld(sx:Int, sy:Int, z:Int):FloatPoint
 	{
-		// first, get the camera world position
 		var camera = Game.instance.camera;
 		var camPx = Projection.worldToPx(camera.x, camera.y).toIntPoint();
 		var px = (camPx.x + (sx / camera.zoom)).floor();
@@ -80,23 +79,16 @@ class Terrain
 		var wy = (py / Terrain.BLOCK_H - px / Terrain.TILE_W_HALF) / 2;
 
 		return {
-			x: wx.floor(),
-			y: wy.floor(),
+			x: wx,
+			y: wy,
 			z: z,
 		};
 	}
 
 	public function raycast(sx:Int, sy:Int):RaycastResult
 	{
-		var d0 = screenToWorld(sx, sy, 0);
-		var d1 = screenToWorld(sx, sy, 1);
-		var d2 = screenToWorld(sx, sy, 2);
 		var d3 = screenToWorld(sx, sy, 3);
-
-		var t0 = getTerrainAt(d0.x, d0.y, d0.z);
-		var t1 = getTerrainAt(d1.x, d1.y, d1.z);
-		var t2 = getTerrainAt(d2.x, d2.y, d2.z);
-		var t3 = getTerrainAt(d3.x, d3.y, d3.z);
+		var t3 = getTerrainAt(d3.x.floor(), d3.y.floor(), d3.z.floor());
 
 		if (t3 != EMPTY)
 		{
@@ -109,8 +101,22 @@ class Terrain
 			};
 		}
 
+		var d2 = screenToWorld(sx, sy, 2);
+		var t2 = getTerrainAt(d2.x.floor(), d2.y.floor(), d2.z.floor());
+
 		if (t2 != EMPTY)
 		{
+			var above = getTerrainAt(d2.x.floor(), d2.y.floor(), (d2.z + 1).floor());
+			if (above != EMPTY)
+			{
+				return {
+					success: true,
+					x: d2.x.round(),
+					y: d2.y.round(),
+					z: d2.z,
+					terrain: above,
+				};
+			}
 			return {
 				success: true,
 				x: d2.x,
@@ -120,8 +126,23 @@ class Terrain
 			};
 		}
 
+		var d1 = screenToWorld(sx, sy, 1);
+		var t1 = getTerrainAt(d1.x.floor(), d1.y.floor(), d1.z.floor());
+
 		if (t1 != EMPTY)
 		{
+			var above = getTerrainAt(d1.x.floor(), d1.y.floor(), (d1.z + 1).floor());
+			if (above != EMPTY)
+			{
+				return {
+					success: true,
+					x: d1.x.round(),
+					y: d1.y.round(),
+					z: d1.z,
+					terrain: above,
+				};
+			}
+
 			return {
 				success: true,
 				x: d1.x,
@@ -131,8 +152,23 @@ class Terrain
 			};
 		}
 
+		var d0 = screenToWorld(sx, sy, 0);
+		var t0 = getTerrainAt(d0.x.floor(), d0.y.floor(), d0.z.floor());
+
 		if (t0 != EMPTY)
 		{
+			var above = getTerrainAt(d0.x.floor(), d0.y.floor(), (d0.z + 1).floor());
+			if (above != EMPTY)
+			{
+				return {
+					success: true,
+					x: d0.x.round(),
+					y: d0.y.round(),
+					z: d0.z,
+					terrain: above,
+				};
+			}
+
 			return {
 				success: true,
 				x: d0.x,
@@ -161,6 +197,17 @@ class Terrain
 		return grids[z].get(x, y);
 	}
 
+	public function setTerrainAt(x:Int, y:Int, z:Int, type:TerrainType)
+	{
+		if (isOutOfBounds(x, y, z))
+		{
+			return;
+		}
+
+		grids[z].set(x, y, type);
+		ob.updateTile(x, y, z);
+	}
+
 	public function isOutOfBounds(x:Int, y:Int, z:Int):Bool
 	{
 		return x < 0 || y < 0 || z < 0 || x >= width || y >= height || z >= depth;
@@ -169,6 +216,7 @@ class Terrain
 	public function generate(seed:Int)
 	{
 		var p = new Perlin(seed);
+		var rocks = new Perlin(seed + 5);
 		var r = new Rand(seed);
 
 		for (g in grids)
@@ -182,32 +230,33 @@ class Terrain
 		{
 			for (y in 0...height)
 			{
-				var h = p.get(new IntPoint(x, y), 24, 3);
+				var h = p.get(x, y, 12, 8);
 
-				trace(x, y, h);
-
-				if (h > .475)
+				if (h > .5)
 				{
 					grids[0].set(x, y, SAND);
 				}
 
-				if (h > .5)
+				if (h > .55)
 				{
-					grids[1].set(x, y, r.pick([DIRT, STONE]));
+					grids[1].set(x, y, STONE);
 				}
 
-				if (h > .54)
+				if (h > .6)
 				{
-					grids[2].set(x, y, r.pick([GRASS, DIRT]));
+					grids[1].set(x, y, STONE);
+					grids[2].set(x, y, GRASS);
 				}
 
-				if (h > .58)
+				if (h > .7)
 				{
-					grids[3].set(x, y, r.pick([GRASS]));
+					grids[1].set(x, y, STONE);
+					grids[2].set(x, y, STONE);
+					grids[3].set(x, y, GRASS);
 				}
 			}
 		}
 
-		ob.init(this);
+		ob.init();
 	}
 }

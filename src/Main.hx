@@ -9,7 +9,7 @@ class Main extends hxd.App
 
 	static function main()
 	{
-		hxd.Res.initEmbed();
+		hxd.Res.initLocal();
 		new Main();
 	}
 

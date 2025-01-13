@@ -8,4 +8,5 @@ enum TileKey
 	TK_STONE;
 	TK_DIRT;
 	TK_GRASS;
+	TK_CURSOR;
 }

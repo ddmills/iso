@@ -3,7 +3,9 @@ package domain.systems;
 import core.Frame;
 import data.Data;
 import data.core.ColorKey;
+import data.resources.TileRegistry;
 import ecs.System;
+import h2d.Bitmap;
 import h2d.Object;
 import h2d.Text;
 import haxe.EnumTools;
@@ -16,11 +18,16 @@ typedef DebugInfo =
 	clock:Text,
 	entities:Text,
 	drawCalls:Text,
+	cursor:Bitmap,
 }
 
 class DebugInfoSystem extends System
 {
 	public var debugInfo:DebugInfo;
+
+	private var cursor_x:Int;
+	private var cursor_y:Int;
+	private var cursor_z:Int;
 
 	public function new()
 	{
@@ -34,8 +41,6 @@ class DebugInfoSystem extends System
 		var wtext = w.toString();
 		var fps = frame.fps.floor();
 
-		var terrain = world.terrain.getTerrainAt(w.x, w.y, 0);
-
 		var sx = game.input.mouse.x.floor();
 		var sy = game.input.mouse.y.floor();
 
@@ -48,6 +53,55 @@ class DebugInfoSystem extends System
 		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
 		debugInfo.clock.text = '${world.clock.tick.floor()} (${world.clock.speed})';
 		debugInfo.drawCalls.text = 'draw ${game.app.engine.drawCalls}';
+
+		if (ray.success)
+		{
+			var x = ray.x.floor();
+			var y = ray.y.floor();
+			var z = ray.z.floor() + 1;
+
+			debugInfo.cursor.color = 0xff00ff.toHxdColor();
+			debugInfo.cursor.visible = true;
+
+			if (x != cursor_x || y != cursor_y || z != cursor_z)
+			{
+				trace('cursor moved');
+				cursor_x = x;
+				cursor_y = y;
+				cursor_z = z;
+
+				debugInfo.cursor.remove();
+
+				debugInfo.cursor.tile.setCenterRatio(0, (z / 4));
+
+				var p = world.terrain.ob.worldToTilePx(x, y, 0);
+
+				debugInfo.cursor.x = p.x;
+				debugInfo.cursor.y = p.y;
+
+				world.terrain.ob.add(debugInfo.cursor, 0);
+				world.terrain.ob.ysort(0);
+			}
+		}
+		else
+		{
+			debugInfo.cursor.visible = false;
+		}
+
+		if (game.input.lmb)
+		{
+			if (world.terrain.getTerrainAt(cursor_x, cursor_y, cursor_z - 1) == EMPTY)
+			{
+				return;
+			}
+
+			if (world.terrain.getTerrainAt(cursor_x, cursor_y, cursor_z) == EMPTY)
+			{
+				world.terrain.setTerrainAt(cursor_x, cursor_y, cursor_z, DIRT);
+				world.terrain.ob.ysort(0);
+				trace('lmb!');
+			}
+		}
 	}
 
 	function getFpsColor(fps:Int):Int
@@ -68,6 +122,7 @@ class DebugInfoSystem extends System
 	override function teardown()
 	{
 		debugInfo.ob.remove();
+		debugInfo.cursor.remove();
 	}
 
 	private function renderDebugInfo()
@@ -95,6 +150,8 @@ class DebugInfoSystem extends System
 		drawCalls.color = ColorKey.C_WHITE.toHxdColor();
 		drawCalls.y = 64;
 
+		var cursor = new Bitmap(Data.Tiles.get(TK_CURSOR));
+
 		debugInfo = {
 			ob: ob,
 			fps: fps,
@@ -102,8 +159,10 @@ class DebugInfoSystem extends System
 			entities: entities,
 			clock: clock,
 			drawCalls: drawCalls,
+			cursor: cursor,
 		};
 
 		game.render(HUD, ob);
+		// game.render(OVERLAY, cursor);
 	}
 }
