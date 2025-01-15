@@ -26,7 +26,7 @@ class SplashScreen extends Screen
 	override function onEnter()
 	{
 		title = Data.Fonts.text(FNT_BIZCAT);
-		title.text = "Template";
+		title.text = game.title;
 		title.color = ColorKey.C_YELLOW.toHxdColor();
 
 		next = Data.Fonts.text(FNT_BIZCAT);

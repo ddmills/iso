@@ -21,13 +21,10 @@ class Main extends hxd.App
 		Commands.Init();
 		Data.Init();
 
-		var window = hxd.Window.getInstance();
-
-		window.title = "Privateers";
-
 		game = Game.Create(this);
+		game.title = "Privateers";
 		game.backgroundColor = game.CLEAR_COLOR;
-		game.screens.set(new SplashScreen(10));
+		game.screens.set(new SplashScreen(1));
 	}
 
 	override function update(dt:Float)

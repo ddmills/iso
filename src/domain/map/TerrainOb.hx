@@ -7,16 +7,8 @@ import data.resources.TileKey;
 import domain.map.Terrain.TerrainType;
 import h2d.Bitmap;
 import h2d.Layers;
-import h2d.filter.Displacement;
 import hxsl.Types.Vec;
 import shaders.WaterShader;
-
-typedef WorldPoint =
-{
-	x:Int,
-	y:Int,
-	z:Int,
-}
 
 class TerrainOb extends Layers
 {
@@ -54,7 +46,7 @@ class TerrainOb extends Layers
 
 	public function updateTile(x:Int, y:Int, z:Int)
 	{
-		var t = terrain.getTerrainAt(x, y, z);
+		var t = terrain.get(x, y, z);
 		var bm = bitmaps[z].get(x, y);
 
 		if (t == EMPTY)
@@ -74,33 +66,27 @@ class TerrainOb extends Layers
 			bm.y = px.y;
 			add(bm, 0);
 			bitmaps[z].set(x, y, bm);
-
-			// if (t == WATER)
-			// {
-
-			// 	wat.mipMap = Nearest;
-			// 	// wat.setCenterRatio(0, z / 4);
-			// 	shader.texture = wat;
-			// 	shader.wpos = new Vec(x, y, z);
-			// 	// var f = new Displacement()
-			// 	bm.addShader(shader);
-			// }
 		}
+
+		var tk = getTileKey(t);
+		var tile = Data.Tiles.get(tk).clone();
+		tile.setCenterRatio(0, z / 4);
+		bm.tile = tile;
 
 		if (t == WATER)
 		{
 			var shader = new WaterShader();
-			var wat = hxd.Res.tiles.water.toTexture();
-			shader.texture = wat;
 			shader.wpos = new Vec(bm.x, bm.y, 0);
 			bm.addShader(shader);
 		}
 		else
 		{
-			var tk = getTileKey(t);
-			var tile = Data.Tiles.get(tk).clone();
-			tile.setCenterRatio(0, z / 4);
-			bm.tile = tile;
+			var shader = bm.getShader(WaterShader);
+
+			if (shader != null)
+			{
+				bm.removeShader(shader);
+			}
 		}
 	}
 

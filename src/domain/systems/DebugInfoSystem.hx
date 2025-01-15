@@ -44,7 +44,7 @@ class DebugInfoSystem extends System
 		var sx = game.input.mouse.x.floor();
 		var sy = game.input.mouse.y.floor();
 
-		var ray = world.terrain.raycast(sx, sy);
+		var ray = world.terrain.raycast.Get(sx, sy);
 		var terrainText = EnumValueTools.getName(ray.terrain);
 
 		debugInfo.fps.text = game.app.engine.fps.floor().toString() + ' ' + frame.fps.floor().toString();
@@ -90,14 +90,14 @@ class DebugInfoSystem extends System
 
 		if (game.input.lmb)
 		{
-			if (world.terrain.getTerrainAt(cursor_x, cursor_y, cursor_z - 1) == EMPTY)
+			if (world.terrain.get(cursor_x, cursor_y, cursor_z - 1) == EMPTY)
 			{
 				return;
 			}
 
-			if (world.terrain.getTerrainAt(cursor_x, cursor_y, cursor_z) == EMPTY)
+			if (world.terrain.get(cursor_x, cursor_y, cursor_z) == EMPTY)
 			{
-				world.terrain.setTerrainAt(cursor_x, cursor_y, cursor_z, DIRT);
+				world.terrain.set(cursor_x, cursor_y, cursor_z, DIRT);
 				world.terrain.ob.ysort(0);
 				trace('lmb!');
 			}

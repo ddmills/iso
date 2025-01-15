@@ -13,6 +13,7 @@ import hxd.Window;
 
 class Game
 {
+	public var title(get, set):String;
 	public var DIE_SIZE:Int = 12;
 	public var TILE_W:Int = 16;
 	public var TILE_H:Int = 24;
@@ -123,5 +124,15 @@ class Game
 	private function setWorld(world:World)
 	{
 		this.world = world;
+	}
+
+	function set_title(value:String):String
+	{
+		return window.title = value;
+	}
+
+	function get_title():String
+	{
+		return window.title;
 	}
 }
