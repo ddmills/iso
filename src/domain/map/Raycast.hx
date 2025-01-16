@@ -3,7 +3,6 @@ package domain.map;
 import common.struct.FloatPoint3;
 import common.util.Projection;
 import core.Game;
-import domain.map.Terrain.TerrainType;
 
 typedef RaycastResult =
 {
@@ -16,9 +15,9 @@ typedef RaycastResult =
 
 class Raycast
 {
-	private var terrain:Terrain;
+	private var terrain:MapData;
 
-	public function new(terrain:Terrain)
+	public function new(terrain:MapData)
 	{
 		this.terrain = terrain;
 	}
@@ -28,10 +27,10 @@ class Raycast
 		var camera = Game.instance.camera;
 		var camPx = Projection.worldToPx(camera.x, camera.y).toIntPoint();
 		var px = (camPx.x + (sx / camera.zoom)).floor();
-		var py = (camPx.y + (sy / camera.zoom)).floor() + (z * Terrain.BLOCK_H);
+		var py = (camPx.y + (sy / camera.zoom)).floor() + (z * MapData.BLOCK_H);
 
-		var wx = (px / Terrain.TILE_W_HALF + py / Terrain.BLOCK_H) / 2;
-		var wy = (py / Terrain.BLOCK_H - px / Terrain.TILE_W_HALF) / 2;
+		var wx = (px / MapData.TILE_W_HALF + py / MapData.BLOCK_H) / 2;
+		var wy = (py / MapData.BLOCK_H - px / MapData.TILE_W_HALF) / 2;
 
 		return {
 			x: wx,
@@ -43,7 +42,7 @@ class Raycast
 	public function Get(sx:Int, sy:Int):RaycastResult
 	{
 		var d3 = screenToWorld(sx, sy, 3);
-		var t3 = terrain.get(d3.x.floor(), d3.y.floor(), d3.z.floor());
+		var t3 = terrain.getTerrain(d3.x.floor(), d3.y.floor(), d3.z.floor());
 
 		if (t3 != EMPTY)
 		{
@@ -57,11 +56,11 @@ class Raycast
 		}
 
 		var d2 = screenToWorld(sx, sy, 2);
-		var t2 = terrain.get(d2.x.floor(), d2.y.floor(), d2.z.floor());
+		var t2 = terrain.getTerrain(d2.x.floor(), d2.y.floor(), d2.z.floor());
 
 		if (t2 != EMPTY)
 		{
-			var above = terrain.get(d2.x.floor(), d2.y.floor(), (d2.z + 1).floor());
+			var above = terrain.getTerrain(d2.x.floor(), d2.y.floor(), (d2.z + 1).floor());
 			if (above != EMPTY)
 			{
 				return {
@@ -82,11 +81,11 @@ class Raycast
 		}
 
 		var d1 = screenToWorld(sx, sy, 1);
-		var t1 = terrain.get(d1.x.floor(), d1.y.floor(), d1.z.floor());
+		var t1 = terrain.getTerrain(d1.x.floor(), d1.y.floor(), d1.z.floor());
 
 		if (t1 != EMPTY)
 		{
-			var above = terrain.get(d1.x.floor(), d1.y.floor(), (d1.z + 1).floor());
+			var above = terrain.getTerrain(d1.x.floor(), d1.y.floor(), (d1.z + 1).floor());
 			if (above != EMPTY)
 			{
 				return {
@@ -108,11 +107,11 @@ class Raycast
 		}
 
 		var d0 = screenToWorld(sx, sy, 0);
-		var t0 = terrain.get(d0.x.floor(), d0.y.floor(), d0.z.floor());
+		var t0 = terrain.getTerrain(d0.x.floor(), d0.y.floor(), d0.z.floor());
 
 		if (t0 != EMPTY)
 		{
-			var above = terrain.get(d0.x.floor(), d0.y.floor(), (d0.z + 1).floor());
+			var above = terrain.getTerrain(d0.x.floor(), d0.y.floor(), (d0.z + 1).floor());
 			if (above != EMPTY)
 			{
 				return {

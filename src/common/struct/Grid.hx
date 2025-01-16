@@ -17,7 +17,7 @@ import common.struct.IntPoint;
 
 	private var data:Array<T>;
 
-	function get_size()
+	inline function get_size()
 	{
 		return height * width;
 	}

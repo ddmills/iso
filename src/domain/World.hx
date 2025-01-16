@@ -4,7 +4,8 @@ import common.tools.Performance;
 import core.Game;
 import data.input.InputGroups;
 import domain.Clock.SaveClock;
-import domain.map.Terrain;
+import domain.map.MapData;
+import domain.map.MapGenerator;
 import hxd.Rand;
 
 typedef SaveWorld =
@@ -18,7 +19,7 @@ class World
 	public var game(get, null):Game;
 	public var clock(default, null):Clock;
 	public var systems(default, null):SystemManager;
-	public var terrain(default, null):Terrain;
+	public var map(default, null):MapData;
 	public var seed:Int = 2;
 	public var rand:Rand;
 	public var input:InputGroups;
@@ -28,7 +29,7 @@ class World
 		clock = new Clock();
 		systems = new SystemManager();
 		input = new InputGroups();
-		terrain = new Terrain();
+		map = new MapData();
 	}
 
 	public function initialize()
@@ -47,9 +48,21 @@ class World
 	{
 		this.seed = seed;
 		rand = new Rand(seed);
-		terrain = new Terrain();
-		terrain.generate(seed);
-		game.render(GROUND, terrain.ob);
+
+		generateMap();
+	}
+
+	public function generateMap()
+	{
+		map?.ob.remove();
+		map = new MapData();
+
+		var gen = new MapGenerator();
+		map = gen.generate({
+			seed: seed
+		});
+
+		game.render(GROUND, map.ob);
 	}
 
 	public function load(data:SaveWorld)

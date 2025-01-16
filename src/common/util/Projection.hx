@@ -2,7 +2,7 @@ package common.util;
 
 import common.struct.Coordinate;
 import core.Game;
-import domain.map.Terrain;
+import domain.map.MapData;
 
 enum Space
 {
@@ -22,13 +22,13 @@ class Projection
 
 	public static function worldToPx(wx:Float, wy:Float):Coordinate
 	{
-		return new Coordinate((wx - wy) * Terrain.TILE_W_HALF, (wx + wy) * Terrain.BLOCK_H, PIXEL);
+		return new Coordinate((wx - wy) * MapData.TILE_W_HALF, (wx + wy) * MapData.BLOCK_H, PIXEL);
 	}
 
 	public static function pxToWorld(px:Float, py:Float):Coordinate
 	{
-		var wx = (px / Terrain.TILE_W_HALF + py / Terrain.BLOCK_H) / 2;
-		var wy = (py / Terrain.BLOCK_H - px / Terrain.TILE_W_HALF) / 2;
+		var wx = (px / MapData.TILE_W_HALF + py / MapData.BLOCK_H) / 2;
+		var wy = (py / MapData.BLOCK_H - px / MapData.TILE_W_HALF) / 2;
 
 		return new Coordinate(wx, wy, WORLD);
 	}
