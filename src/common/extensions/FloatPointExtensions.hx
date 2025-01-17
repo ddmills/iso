@@ -50,4 +50,9 @@ class FloatPointExtensions
 	{
 		return new Coordinate(p.x, p.y, WORLD);
 	}
+
+	static public inline function toIntPoint(p:FloatPoint)
+	{
+		return new IntPoint(p.x.floor(), p.y.floor());
+	}
 }

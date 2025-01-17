@@ -1,7 +1,10 @@
 package domain.components;
 
+import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
+import common.util.Projection;
 import core.rendering.RenderLayerManager.RenderLayerType;
+import domain.map.MapData;
 import ecs.Component;
 import h2d.Graphics;
 import shaders.SpriteShader;
@@ -13,6 +16,7 @@ abstract class Drawable extends Component
 	@save public var width(get, set):Float;
 	@save public var height(get, set):Float;
 	@save public var origin(default, set):FloatPoint = new FloatPoint(.5, .5);
+	@save public var worldPos(default, set):FloatPoint3;
 
 	public var ob(default, null):h2d.Object;
 	public var shader(default, null):SpriteShader;
@@ -25,9 +29,10 @@ abstract class Drawable extends Component
 	public function new(layer = OBJECTS)
 	{
 		shader = new SpriteShader();
-
-		this.layer = layer;
 		this.ob = new h2d.Object();
+		this.layer = layer;
+
+		worldPos = new FloatPoint3(0, 0, 0);
 	}
 
 	abstract function getDrawable():h2d.Drawable;
@@ -40,10 +45,22 @@ abstract class Drawable extends Component
 
 	abstract function getHeight():Float;
 
-	public function updatePos(px:Float, py:Float)
+	public function updatePos()
 	{
-		ob.x = px;
-		ob.y = py;
+		var px = Projection.worldToPx(worldPos.x, worldPos.y);
+
+		ob.x = px.x;
+		ob.y = px.y;
+
+		if (drawable != null)
+		{
+			var originOffsetX = -(origin.x * getWidth());
+			var originOffsetY = -(origin.y * getHeight());
+			var zOffset = -(worldPos.z * MapData.BLOCK_H);
+
+			drawable.x = originOffsetX;
+			drawable.y = originOffsetY + zOffset;
+		}
 	}
 
 	inline function set_isVisible(value:Bool):Bool
@@ -85,17 +102,8 @@ abstract class Drawable extends Component
 	inline function set_origin(value:FloatPoint):FloatPoint
 	{
 		origin = value;
-		recomputeOrigin();
+		updatePos();
 		return value;
-	}
-
-	function recomputeOrigin()
-	{
-		if (drawable != null)
-		{
-			drawable.x = origin.x * -getWidth();
-			drawable.y = origin.y * -getHeight();
-		}
 	}
 
 	function set_debug(value:Bool):Bool
@@ -104,19 +112,30 @@ abstract class Drawable extends Component
 		{
 			var b = drawable.getBounds(ob);
 
+			var zOffset = -(worldPos.z * MapData.BLOCK_H);
+
 			debugGraphics = new Graphics(ob);
-			debugGraphics.lineStyle(2, 0xFF00FF, .1);
+			debugGraphics.lineStyle(1, 0xFF00FF, .1);
 			debugGraphics.drawRect(drawable.x, drawable.y, b.width, b.height);
 			debugGraphics.beginFill(0xFF7300, 1);
 			debugGraphics.lineStyle(2, 0xFF00FF, 0);
 			debugGraphics.drawCircle(0, 0, 3);
+			debugGraphics.beginFill(0x00B7FF, 1);
+			debugGraphics.drawCircle(0, zOffset, 2);
 		}
 		else
 		{
-			debugGraphics.remove();
+			debugGraphics?.remove();
 			debugGraphics = null;
 		}
 
 		return debug = value;
+	}
+
+	function set_worldPos(value:FloatPoint3):FloatPoint3
+	{
+		worldPos = value;
+		updatePos();
+		return value;
 	}
 }

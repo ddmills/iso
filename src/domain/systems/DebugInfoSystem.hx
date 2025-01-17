@@ -33,6 +33,7 @@ class DebugInfoSystem extends System
 	override function update(frame:Frame)
 	{
 		var w = game.input.mouse.toWorld().toIntPoint();
+		var px = game.input.mouse.toWorld();
 		var wtext = w.toString();
 		var fps = frame.fps.floor();
 
@@ -40,11 +41,14 @@ class DebugInfoSystem extends System
 		var sy = game.input.mouse.y.floor();
 
 		var ray = world.map.raycast.Get(sx, sy);
+		var rayText = '[${ray.x.floor()}, ${ray.y.floor()}, ${ray.z.floor()}]';
 		var terrainText = EnumValueTools.getName(ray.terrain);
+
+		var w = Projection.screenToWorld(sx, sy);
 
 		debugInfo.fps.text = game.app.engine.fps.floor().toString() + ' ' + frame.fps.floor().toString();
 		debugInfo.fps.color = getFpsColor(fps).toHxdColor();
-		debugInfo.pos.text = '$wtext Z(${game.camera.zoom}) [$terrainText]';
+		debugInfo.pos.text = '${px.toString(1)} Z(${game.camera.zoom}) $rayText [$terrainText]';
 		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
 		debugInfo.clock.text = '${world.clock.tick.floor()} (${world.clock.speed})';
 		debugInfo.drawCalls.text = 'draw ${game.app.engine.drawCalls}';

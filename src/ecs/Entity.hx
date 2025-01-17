@@ -1,8 +1,7 @@
 package ecs;
 
 import bits.Bits;
-import common.struct.Coordinate;
-import common.util.Projection;
+import common.struct.FloatPoint3;
 import common.util.UniqueId;
 import core.Game;
 import domain.components.Drawable;
@@ -17,21 +16,23 @@ class Entity
 
 	var _x:Float;
 	var _y:Float;
+	var _z:Float;
 
 	public var game(get, null):Game;
 	public var registry(get, null):Registry;
 	public var name(get, null):String;
 	public var id(default, null):String;
-	public var pos(get, set):Coordinate;
+	public var pos(get, set):FloatPoint3;
 	public var x(get, set):Float;
 	public var y(get, set):Float;
+	public var z(get, set):Float;
 	public var isDestroyed(default, null):Bool;
 
 	private var components:Map<String, Array<Component>>;
 
 	private var isCandidacyEnabled = true;
 
-	public function new(register = true, ?pos:Coordinate)
+	public function new(register = true, ?pos:FloatPoint3)
 	{
 		_x = 0;
 		_y = 0;
@@ -104,15 +105,16 @@ class Entity
 
 		flags.set(component.bit);
 		component._attach(this);
-		if (isCandidacyEnabled)
-		{
-			registry.candidacy(this);
-		}
+
 		if (Std.isOfType(component, Drawable))
 		{
 			drawable = cast component;
-			var p = pos.toPx();
-			drawable.updatePos(p.x, p.y);
+			drawable.worldPos = pos;
+		}
+
+		if (isCandidacyEnabled)
+		{
+			registry.candidacy(this);
 		}
 	}
 
@@ -143,10 +145,12 @@ class Entity
 		}
 
 		component._remove();
+
 		if (isCandidacyEnabled)
 		{
 			registry.candidacy(this);
 		}
+
 		if (Std.isOfType(component, Drawable))
 		{
 			drawable = null;
@@ -214,50 +218,56 @@ class Entity
 		return Game.instance.registry;
 	}
 
-	public function internalSetPos(x:Int, y:Int)
+	function get_pos():FloatPoint3
 	{
-		_x = x;
-		_y = y;
+		return new FloatPoint3(_x, _y, _z);
+	}
+
+	function set_pos(value:FloatPoint3):FloatPoint3
+	{
+		_x = value.x;
+		_y = value.y;
+		_z = value.z;
 
 		if (drawable != null)
 		{
-			var px = Projection.worldToPx(x, y);
-			drawable.updatePos(px.x, px.y);
+			drawable.worldPos = value;
 		}
+
+		return value;
 	}
 
-	function get_pos():Coordinate
-	{
-		return new Coordinate(_x, _y, WORLD);
-	}
-
-	function set_pos(value:Coordinate):Coordinate
-	{
-		var w = value.toWorld();
-
-		return w;
-	}
-
-	function get_x():Float
+	inline function get_x():Float
 	{
 		return _x;
 	}
 
-	function get_y():Float
+	inline function get_y():Float
 	{
 		return _y;
 	}
 
-	function set_x(value:Float):Float
+	inline function get_z():Float
 	{
-		set_pos(new Coordinate(value, _y, WORLD));
-		return _x;
+		return _z;
 	}
 
-	function set_y(value:Float):Float
+	inline function set_x(value:Float):Float
 	{
-		set_pos(new Coordinate(_x, value, WORLD));
-		return _y;
+		_x = value;
+		return value;
+	}
+
+	inline function set_y(value:Float):Float
+	{
+		_y = value;
+		return value;
+	}
+
+	inline function set_z(value:Float):Float
+	{
+		_z = value;
+		return value;
 	}
 
 	public function clone(newId:String = null):Entity
@@ -279,6 +289,7 @@ class Entity
 			pos: {
 				x: x,
 				y: y,
+				z: z,
 			},
 			components: cdata,
 		};
@@ -302,7 +313,7 @@ class Entity
 			c.load(cdata.data);
 			entity.add(c);
 		}
-		entity.pos = new Coordinate(data.pos.x, data.pos.y, WORLD);
+		entity.pos = new FloatPoint3(data.pos.x, data.pos.y, data.pos.z);
 		entity.isCandidacyEnabled = true;
 		entity.registry.candidacy(entity);
 		entity.fireEvent(new EntityLoadedEvent(tickDelta));
@@ -327,7 +338,7 @@ typedef EntitySaveData =
 	id:String,
 	pos:
 	{
-		x:Float, y:Float,
+		x:Float, y:Float, z:Float,
 	},
 	components:Array<ComponentSaveData>,
 }

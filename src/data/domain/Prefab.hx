@@ -1,11 +1,11 @@
 package data.domain;
 
-import common.struct.Coordinate;
+import common.struct.FloatPoint3;
 import ecs.Entity;
 
 abstract class Prefab
 {
 	public function new() {};
 
-	public abstract function Create(options:Dynamic, pos:Coordinate):Entity;
+	public abstract function Create(options:Dynamic, pos:FloatPoint3):Entity;
 }

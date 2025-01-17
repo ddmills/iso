@@ -61,7 +61,7 @@ class CameraInputGroup
 			}
 			else
 			{
-				Game.instance.camera.focus = follow.pos;
+				Game.instance.camera.focus = new Coordinate(follow.pos.x, follow.pos.y, WORLD);
 			}
 		}
 	}

@@ -2,11 +2,19 @@ package domain.map;
 
 import common.struct.Grid;
 import common.struct.IntPoint;
+import common.util.Projection;
 import data.Data;
 import data.resources.TileKey;
 import h2d.Bitmap;
+import h2d.Object;
 import hxsl.Types.Vec;
 import shaders.WaterShader;
+
+typedef RenderCell =
+{
+	ob:Object,
+	bm:Bitmap,
+}
 
 class Chunk
 {
@@ -16,7 +24,7 @@ class Chunk
 	public var worldPos(default, null):IntPoint;
 	public var chunkPos(default, null):IntPoint;
 
-	private var bitmaps:Array<Grid<Bitmap>>;
+	private var bitmaps:Array<Grid<RenderCell>>;
 	private var size:Int;
 
 	public function new(chunkIdx:Int, map:MapData)
@@ -36,7 +44,7 @@ class Chunk
 
 		for (x in 0...map.depth)
 		{
-			var g = new Grid<Bitmap>(map.width, map.height);
+			var g = new Grid<RenderCell>(map.width, map.height);
 			bitmaps.push(g);
 		}
 	}
@@ -67,7 +75,7 @@ class Chunk
 		{
 			for (bm in layer)
 			{
-				bm.value.remove();
+				bm.value.ob.remove();
 			}
 		}
 	}
@@ -80,7 +88,8 @@ class Chunk
 		{
 			for (z in 0...map.depth)
 			{
-				bitmaps[z].get(wx, wy)?.remove();
+				bitmaps[z].get(wx, wy)?.ob.remove();
+				bitmaps[z].set(wx, wy, null);
 			}
 
 			return;
@@ -88,39 +97,52 @@ class Chunk
 
 		for (z in 0...(t.tileHeight + 1))
 		{
-			var bm = bitmaps[z].get(wx, wy);
+			var cell = bitmaps[z].get(wx, wy);
 
-			if (bm == null)
+			if (cell == null)
 			{
-				var px = map.worldToTilePx(wx, wy, 0);
+				var px = Projection.worldToPx(wx + .5, wy + .5);
 
-				bm = new Bitmap();
+				var ob = new Object();
+				ob.x = px.x;
+				ob.y = px.y;
+
+				var bm = new Bitmap(ob);
 				bm.width = MapData.TILE_W;
 				bm.height = MapData.TILE_H;
-				bm.x = px.x;
-				bm.y = px.y;
-				map.ob.add(bm, 0);
-				bitmaps[z].set(wx, wy, bm);
+				bm.x = -MapData.TILE_W_HALF;
+
+				var originOffset = -(MapData.TILE_H / 2);
+				var zOffset = -(z * MapData.BLOCK_H);
+
+				bm.y = originOffset + zOffset;
+
+				map.ob.add(ob, 0);
+
+				cell = {
+					bm: bm,
+					ob: ob,
+				};
+				bitmaps[z].set(wx, wy, cell);
 			}
 
 			var tk = getTileKey(t.terrain);
-			var tile = Data.Tiles.get(tk).clone();
-			tile.setCenterRatio(0, z / 4);
-			bm.tile = tile;
+			var tile = Data.Tiles.get(tk);
+			cell.bm.tile = tile;
 
 			if (t.terrain == WATER)
 			{
 				var shader = new WaterShader();
-				shader.wpos = new Vec(bm.x, bm.y, 0);
-				bm.addShader(shader);
+				shader.wpos = new Vec(wx, wy, 0);
+				cell.bm.addShader(shader);
 			}
 			else
 			{
-				var shader = bm.getShader(WaterShader);
+				var shader = cell.bm.getShader(WaterShader);
 
 				if (shader != null)
 				{
-					bm.removeShader(shader);
+					cell.bm.removeShader(shader);
 				}
 			}
 		}

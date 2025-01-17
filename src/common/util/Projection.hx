@@ -1,6 +1,7 @@
 package common.util;
 
 import common.struct.Coordinate;
+import common.struct.FloatPoint;
 import core.Game;
 import domain.map.MapData;
 
@@ -20,9 +21,9 @@ class Projection
 		return Game.instance;
 	}
 
-	public static function worldToPx(wx:Float, wy:Float):Coordinate
+	public static function worldToPx(wx:Float, wy:Float):FloatPoint
 	{
-		return new Coordinate((wx - wy) * MapData.TILE_W_HALF, (wx + wy) * MapData.BLOCK_H, PIXEL);
+		return new FloatPoint((wx - wy) * MapData.TILE_W_HALF, (wx + wy) * MapData.BLOCK_H);
 	}
 
 	public static function pxToWorld(px:Float, py:Float):Coordinate

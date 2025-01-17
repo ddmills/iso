@@ -2,6 +2,7 @@ package data.resources;
 
 enum TileKey
 {
+	TK_CUBE;
 	TK_UNKNOWN;
 	TK_WATER;
 	TK_SAND;
@@ -9,4 +10,9 @@ enum TileKey
 	TK_DIRT;
 	TK_GRASS;
 	TK_CURSOR;
+	TK_TREE_1;
+	TK_TREE_2;
+	TK_TREE_PALM_1;
+	TK_TREE_PALM_2;
+	TK_TREE_PALM_3;
 }

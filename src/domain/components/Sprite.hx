@@ -1,9 +1,8 @@
 package domain.components;
 
-import core.Game;
 import core.rendering.RenderLayerManager.RenderLayerType;
+import data.Data;
 import data.resources.TileKey;
-import data.resources.TileResources;
 import h2d.Bitmap;
 import h2d.Tile;
 
@@ -15,16 +14,18 @@ class Sprite extends Drawable
 	public var bm(default, null):Bitmap;
 	public var tile(get, never):Tile;
 
-	@save private var _width:Float = Game.TILE_WIDTH;
-	@save private var _height:Float = Game.TILE_WIDTH; // TODO default?
+	@save private var _width:Float = 32;
+	@save private var _height:Float = 32;
 
 	public function new(tileKey:TileKey, layer = OBJECTS)
 	{
 		this.tileKey = tileKey;
 		super(layer);
+		_width = tile.width;
+		_height = tile.height;
 		bm = new Bitmap(tile, ob);
-		bm.addShader(shader);
-		recomputeOrigin();
+		// bm.addShader(shader);
+		updatePos();
 	}
 
 	public function getBitmapClone():Bitmap
@@ -37,10 +38,10 @@ class Sprite extends Drawable
 	{
 		if (tileKeyOverride != null)
 		{
-			return TileResources.Get(tileKeyOverride);
+			return Data.Tiles.get(tileKeyOverride);
 		}
 
-		return TileResources.Get(tileKey);
+		return Data.Tiles.get(tileKey);
 	}
 
 	public function set_tileKey(value:TileKey):TileKey
@@ -75,7 +76,7 @@ class Sprite extends Drawable
 		if (bm.tile != null)
 		{
 			bm.scaleX = value / bm.tile.width;
-			recomputeOrigin();
+			updatePos();
 		}
 
 		return value;
@@ -88,7 +89,7 @@ class Sprite extends Drawable
 		if (bm.tile != null)
 		{
 			bm.scaleY = value / bm.tile.height;
-			recomputeOrigin();
+			updatePos();
 		}
 
 		return value;

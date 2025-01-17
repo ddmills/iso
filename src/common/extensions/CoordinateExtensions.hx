@@ -4,20 +4,28 @@ import common.algorithm.Distance;
 import common.struct.Cardinal;
 import common.struct.Coordinate;
 import common.struct.FloatPoint;
-import common.util.Easing.EasingType;
 import common.util.Easing;
 import common.util.Projection;
-import core.Game;
 
 class CoordinateExtensions
 {
 	static public inline function toString(c:Coordinate, precision:Int = null):String
 	{
+		if (precision == null)
+		{
+			return switch c.space
+			{
+				case SCREEN: 'S(${c.x},${c.y})';
+				case PIXEL: 'P(${c.x},${c.y})';
+				case WORLD: 'W(${c.x},${c.y})';
+			}
+		}
+
 		return switch c.space
 		{
-			case SCREEN: 'S(${c.x},${c.y})';
-			case PIXEL: 'P(${c.x},${c.y})';
-			case WORLD: 'W(${c.x},${c.y})';
+			case SCREEN: 'S(${c.x.format(precision)},${c.y.format(precision)})';
+			case PIXEL: 'P(${c.x.format(precision)},${c.y.format(precision)})';
+			case WORLD: 'W(${c.x.format(precision)},${c.y.format(precision)})';
 		}
 	}
 
@@ -64,7 +72,7 @@ class CoordinateExtensions
 		{
 			case PIXEL: c;
 			case SCREEN: Projection.screenToPx(c.x, c.y);
-			case WORLD: Projection.worldToPx(c.x, c.y);
+			case WORLD: Projection.worldToPx(c.x, c.y).asWorld();
 		}
 	}
 

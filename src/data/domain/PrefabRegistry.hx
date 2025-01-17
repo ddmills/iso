@@ -1,9 +1,7 @@
 package data.domain;
 
-import common.struct.Coordinate;
 import common.struct.DataRegistry;
-import common.struct.IntPoint;
-import core.Game;
+import common.struct.FloatPoint3;
 
 class PrefabRegistry extends DataRegistry<PrefabType, Prefab>
 {
@@ -12,9 +10,9 @@ class PrefabRegistry extends DataRegistry<PrefabType, Prefab>
 		super();
 	}
 
-	public function spawn(type:PrefabType, ?pos:Coordinate, ?options:Dynamic)
+	public function spawn(type:PrefabType, ?pos:FloatPoint3, ?options:Dynamic)
 	{
-		var p = pos == null ? new Coordinate(0, 0, WORLD) : pos.toWorld().floor();
+		var p = pos ?? new FloatPoint3(0, 0, 0);
 
 		var o = options == null ? {} : options;
 		var entity = Data.Prefabs.get(type).Create(o, p);

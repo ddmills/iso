@@ -1,7 +1,7 @@
 package domain.map;
 
+import common.struct.FloatPoint;
 import common.struct.Grid;
-import common.struct.IntPoint;
 
 class MapData
 {
@@ -73,14 +73,6 @@ class MapData
 
 		data.get(x, y).terrain = type;
 		chunks.updateTerrainBm(x, y);
-	}
-
-	public function worldToTilePx(x:Int, y:Int, z:Int):IntPoint
-	{
-		var px = (x - y) * MapData.TILE_W_HALF;
-		var py = (x + y - z) * MapData.BLOCK_H;
-
-		return new IntPoint(px.floor() - MapData.TILE_W_HALF, py.floor() - MapData.BLOCK_H);
 	}
 
 	public function isOutOfBounds(x:Int, y:Int):Bool

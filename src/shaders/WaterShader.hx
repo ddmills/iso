@@ -20,22 +20,37 @@ class WaterShader extends Shader
 			@param var wpos:Vec3;
 			function fragment()
 			{
+				var uv_in = input.uv;
+
+				var surface_x = uv_in.x;
+				var surface_y = clamp(-.25 + (uv_in.y * 1.5), 0, 1);
+
+				var local_x = clamp(surface_x / 2 + surface_y, 0, 1);
+				var local_y = clamp(surface_y - surface_x / 2, 0, 1);
+
+				var world_x = wpos.x + local_x;
+				var world_y = wpos.y + local_y;
+
 				var speed = 1;
-				var intensity1 = .025;
-				var intensity2 = .025;
-				var frequency1 = 1;
-				var frequency2 = 7;
-				var vert_offset = .04;
+				var vert_offset = .1;
 
-				var disp1 = ((sin((time * speed) + ((wpos.y + input.uv.y) * frequency1)) + 1) * intensity1) + vert_offset;
-				var disp2 = ((sin((time * speed * 2) + ((wpos.y + input.uv.y) * frequency2)) + 1) * intensity2);
+				var x_factor = .2;
+				var y_factor = 1;
 
-				var uv = input.uv - vec2(0, disp1 + disp2);
+				var wave_clamped = (sin((time * speed) + (world_y * y_factor) + (world_x * x_factor)) + 1) / 2;
+
+				var displacement = wave_clamped / 10;
+
+				var uv = uv_in - vec2(0, displacement + vert_offset);
 
 				var scaled_uv = uv * uvPos.zw + uvPos.xy;
 				var tex = texture.get(scaled_uv);
 
 				pixelColor.rgba = tex.rgba;
+
+				// pixelColor.r = (world_x / 16) % 1;
+				// pixelColor.g = (world_y / 16) % 1;
+				// pixelColor.b = 0;
 			}
 		};
 }
