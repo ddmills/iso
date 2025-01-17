@@ -1,10 +1,16 @@
 package domain.map;
 
+import common.rand.Perlin;
+import common.struct.FloatPoint3;
+import common.struct.FloatPoint;
 import common.struct.Grid;
 import common.struct.IntPoint;
 import common.util.Projection;
+import core.Game;
 import data.Data;
 import data.resources.TileKey;
+import domain.components.Sprite;
+import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Object;
 import hxsl.Types.Vec;
@@ -58,11 +64,28 @@ class Chunk
 
 		trace('load', chunkIdx);
 
+		var p = new Perlin(Game.instance.world.seed);
+
 		for (x in 0...size)
 		{
 			for (y in 0...size)
 			{
-				updateTerrainBm(worldPos.x + x, worldPos.y + y);
+				var wx = worldPos.x + x;
+				var wy = worldPos.y + y;
+				updateTerrainBm(wx, wy);
+
+				var tree = p.get(wx, wy, 5, 20) > .65;
+				var cell = map.get(wx, wy);
+
+				if ((cell.terrain == GRASS || cell.terrain == SAND) && tree)
+				{
+					var tk = Game.instance.world.rand.pick([TileKey.TK_TREE_PALM_1, TileKey.TK_TREE_PALM_2, TK_TREE_PALM_3]);
+					var e = new Entity();
+					var sprite = new Sprite(tk);
+					sprite.origin = new FloatPoint(.5, .9);
+					e.add(sprite);
+					e.pos = new FloatPoint3(wx + .5, wy + .5, cell.tileHeight);
+				}
 			}
 		}
 
@@ -123,6 +146,7 @@ class Chunk
 					bm: bm,
 					ob: ob,
 				};
+
 				bitmaps[z].set(wx, wy, cell);
 			}
 

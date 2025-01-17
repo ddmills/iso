@@ -4,6 +4,7 @@ import hxsl.Shader;
 
 class WaterShader extends Shader
 {
+	// @formatter:off
 	static var SRC =
 		{
 			@input var input:
@@ -14,10 +15,14 @@ class WaterShader extends Shader
 				};
 			var pixelColor:Vec4;
 			var calculatedUV:Vec2;
+
 			@global var time:Float;
+
 			@borrow(h3d.shader.Base2d) var texture:Sampler2D;
 			@borrow(h3d.shader.Base2d) var uvPos:Vec4;
+
 			@param var wpos:Vec3;
+
 			function fragment()
 			{
 				var uv_in = input.uv;
@@ -53,4 +58,5 @@ class WaterShader extends Shader
 				// pixelColor.b = 0;
 			}
 		};
+	// @formatter:on
 }
