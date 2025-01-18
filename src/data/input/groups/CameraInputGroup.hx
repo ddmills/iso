@@ -2,7 +2,6 @@ package data.input.groups;
 
 import common.struct.Coordinate;
 import core.Game;
-import core.input.Command;
 import ecs.Entity;
 
 class CameraInputGroup
@@ -63,30 +62,6 @@ class CameraInputGroup
 			{
 				Game.instance.camera.focus = new Coordinate(follow.pos.x, follow.pos.y, WORLD);
 			}
-		}
-	}
-
-	public function handle(command:Command)
-	{
-		var world = Game.instance.world;
-
-		switch (command.type)
-		{
-			case CMD_PAUSE:
-				world.clock.isPaused = !world.clock.isPaused;
-			case CMD_SPEED_1:
-				world.clock.speed = .5;
-				world.clock.isPaused = false;
-			case CMD_SPEED_2:
-				world.clock.speed = 1;
-				world.clock.isPaused = false;
-			case CMD_SPEED_3:
-				world.clock.speed = 2;
-				world.clock.isPaused = false;
-			case CMD_SPEED_4:
-				world.clock.speed = 3;
-				world.clock.isPaused = false;
-			case _:
 		}
 	}
 }

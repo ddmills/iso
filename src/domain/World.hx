@@ -4,6 +4,7 @@ import common.struct.FloatPoint3;
 import common.tools.Performance;
 import core.Game;
 import data.input.InputGroups;
+import domain.AiManager.AIManager;
 import domain.Clock.ClockSave;
 import domain.PlayerManager.PlayerSave;
 import domain.map.MapData;
@@ -23,6 +24,7 @@ class World
 	public var clock(default, null):Clock;
 	public var systems(default, null):SystemManager;
 	public var player(default, null):PlayerManager;
+	public var ai(default, null):AIManager;
 	public var map(default, null):MapData;
 	public var seed:Int = 2;
 	public var rand:Rand;
@@ -33,6 +35,7 @@ class World
 		clock = new Clock();
 		systems = new SystemManager();
 		player = new PlayerManager();
+		ai = new AIManager();
 		input = new InputGroups();
 		map = new MapData();
 	}
@@ -45,7 +48,6 @@ class World
 
 	public function updateSystems()
 	{
-		clock.update(game.frame);
 		systems.update(game.frame);
 	}
 

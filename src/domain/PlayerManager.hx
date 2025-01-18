@@ -6,11 +6,13 @@ import ecs.Entity;
 
 typedef PlayerSave =
 {
+	entity:EntitySaveData,
 	ship:EntitySaveData,
 }
 
 class PlayerManager
 {
+	public var entity(default, default):Entity;
 	public var ship(default, default):Entity;
 	public var ship_x(get, set):Float;
 	public var ship_y(get, set):Float;
@@ -21,20 +23,21 @@ class PlayerManager
 
 	public function create(pos:FloatPoint3)
 	{
+		entity = Prefab.Spawn(PLAYER, pos);
 		ship = Prefab.Spawn(PLAYER_SHIP, pos);
 	}
 
 	public function load(data:PlayerSave)
 	{
+		entity = Entity.Load(data.entity);
 		ship = Entity.Load(data.ship);
 	}
 
 	public function save(teardown:Bool = false):PlayerSave
 	{
-		var shipSave = ship.save();
-
 		return {
-			ship: shipSave
+			ship: ship.save(),
+			entity: entity.save(),
 		};
 	}
 

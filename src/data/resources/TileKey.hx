@@ -3,6 +3,7 @@ package data.resources;
 enum TileKey
 {
 	TK_SHIP;
+	TK_SHARK_FINS;
 	TK_CUBE;
 	TK_UNKNOWN;
 	TK_WATER;

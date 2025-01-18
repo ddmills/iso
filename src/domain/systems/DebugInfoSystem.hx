@@ -50,7 +50,7 @@ class DebugInfoSystem extends System
 		debugInfo.fps.color = getFpsColor(fps).toHxdColor();
 		debugInfo.pos.text = '${px.toString(1)} Z(${game.camera.zoom}) $rayText [$terrainText]';
 		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
-		debugInfo.clock.text = '${world.clock.tick.floor()} (${world.clock.speed})';
+		debugInfo.clock.text = '${world.clock.friendlyString()} [${world.clock.tick}])';
 		debugInfo.drawCalls.text = 'draw ${game.app.engine.drawCalls}';
 	}
 

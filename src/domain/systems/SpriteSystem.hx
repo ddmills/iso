@@ -23,11 +23,8 @@ class SpriteSytem extends System
 
 	private function renderDrawable(drawable:Drawable)
 	{
-		trace('render');
 		if (drawable != null)
 		{
-			trace('here!');
-			// game.render(drawable.layer, drawable.drawable);
 			world.map.ob.add(drawable.ob, 0);
 			drawable.debug = debug;
 		}

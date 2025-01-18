@@ -7,6 +7,7 @@ import core.Screen;
 import core.input.Command;
 import core.input.KeyCode;
 import data.domain.Prefab;
+import domain.systems.EnergySystem;
 import ecs.Entity;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
@@ -89,12 +90,19 @@ class PlayScreen extends Screen
 
 		var x = ray.x.floor() + .5;
 		var y = ray.y.floor() + .5;
-		var z = ray.z.floor();
-
+		var z = ray.z.floor() + 1;
 		var pos = new FloatPoint3(x, y, z);
 
-		// Prefab.Spawn(TREE_PALM, pos);
-		world.player.ship_pos = pos;
+		if (game.input.lmb)
+		{
+			world.player.ship_pos = pos;
+			EnergySystem.ConsumeEnergy(world.player.entity, ACT_MOVE);
+		}
+
+		if (game.input.rmb)
+		{
+			Prefab.Spawn(SHARK, pos);
+		}
 	}
 
 	override function onKeyDown(key:KeyCode)
@@ -120,7 +128,6 @@ class PlayScreen extends Screen
 			case CMD_SAVE:
 				game.screens.push(new SaveScreen(true));
 			case _:
-				world.input.camera.handle(command);
 		}
 	}
 

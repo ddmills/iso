@@ -1,99 +1,133 @@
 package domain;
 
-import core.Frame;
-
 typedef ClockSave =
 {
-	tick:Float,
-	speed:Float,
+	tick:Int,
 }
 
 class Clock
 {
-	private var _speed:Float = 1;
+	public static var DAY_START:Int = 0;
+	public static var HOUR_START:Int = 10;
 
-	/**
-	 * In-game seconds
-	 */
-	public var tick(default, null):Float;
+	public static var MINUTES_PER_HOUR:Int = 60;
+	public static var HOURS_PER_DAY:Int = 24;
 
-	/**
-	 * In-game seconds since last frame
-	 */
-	public var deltaTick(default, null):Float;
+	public static var TICKS_PER_TURN:Int = 100;
+	public static var TICKS_PER_MINUTE:Int = 100;
+	public static var TICKS_PER_HOUR:Int = TICKS_PER_MINUTE * MINUTES_PER_HOUR;
+	public static var TICKS_PER_DAY:Int = TICKS_PER_HOUR * HOURS_PER_DAY;
 
-	/**
-	 * Speed of the game, 2 speed = 2 in-game seconds per actual second 
-	 */
-	public var speed(get, set):Float;
+	public var tick(default, null):Int;
+	public var tickDelta(default, null):Int;
+	public var turn(get, never):Int;
+	public var turnDelta(default, null):Int;
+	public var subTurn(get, never):Int;
 
-	/**
-	 * Pause the game
-	 */
-	public var isPaused(default, set):Bool = false;
+	public var day(get, never):Int;
+	public var hour(get, never):Int;
+	public var minute(get, never):Int;
+	public var progress(get, never):Float;
 
 	public function new()
 	{
 		tick = 0;
-		deltaTick = 0;
+		tickDelta = 0;
+		turnDelta = 0;
 	}
 
 	public function save():ClockSave
 	{
 		return {
 			tick: tick,
-			speed: _speed,
-		}
+		};
 	}
 
-	public function load(save:ClockSave)
+	public function load(data:ClockSave)
 	{
-		_speed = save.speed;
-		tick = save.tick;
-		isPaused = true;
+		tick = data.tick;
 	}
 
-	public function update(frame:Frame)
+	public function incrementTick(delta)
 	{
-		if (!isPaused)
-		{
-			deltaTick = frame.dt * speed;
-			tick += deltaTick;
-		}
-		else
-		{
-			deltaTick = 0;
-		}
+		var prevTurn = turn;
+
+		tickDelta += delta;
+		tick += delta;
+
+		turnDelta = turn - prevTurn;
 	}
 
-	public function reset()
+	public static function ticksToMinutes(ticks:Int):Float
 	{
-		tick = 0;
-		deltaTick = 0;
-		_speed = 1;
-		isPaused = false;
+		return ticks / TICKS_PER_MINUTE;
 	}
 
-	function set_speed(value:Float):Float
+	public static function ticksToHours(ticks:Int):Float
 	{
-		if (_speed != value)
-		{
-			_speed = value;
-		}
-		return value;
+		return ticks / TICKS_PER_HOUR;
 	}
 
-	function set_isPaused(value:Bool):Bool
+	public static function ticksToDays(ticks:Int):Float
 	{
-		if (isPaused != value)
-		{
-			isPaused = value;
-		}
-		return value;
+		return ticks / TICKS_PER_DAY;
 	}
 
-	function get_speed():Float
+	inline function get_turn():Int
 	{
-		return isPaused ? 0 : _speed;
+		return (tick / TICKS_PER_TURN).floor();
+	}
+
+	inline function get_subTurn():Int
+	{
+		return (tick % TICKS_PER_TURN).floor();
+	}
+
+	public function clearDeltas()
+	{
+		tickDelta = 0;
+		turnDelta = 0;
+	}
+
+	public function toString()
+	{
+		return '${turn}.${subTurn}';
+	}
+
+	public function friendlyString()
+	{
+		var h = hour.toString().lpad(2);
+		var m = minute.toString().lpad(2, '0');
+		var d = day.floor();
+		return 'Day $d, $h:$m';
+	}
+
+	function get_day():Int
+	{
+		var days = ticksToDays(tick + (TICKS_PER_HOUR * HOUR_START));
+
+		return days.floor();
+	}
+
+	function get_hour():Int
+	{
+		return (HOUR_START + ticksToHours(tick).floor()) % HOURS_PER_DAY;
+	}
+
+	function get_minute():Int
+	{
+		return ticksToMinutes(tick).floor() % MINUTES_PER_HOUR;
+	}
+
+	public function getDaylight():Float
+	{
+		var d = ticksToDays(tick + (TICKS_PER_HOUR * HOUR_START));
+		var x = d - d.floor();
+		return 1 - ((Math.cos(2 * Math.PI * x) + 1) / 2).pow(2);
+	}
+
+	function get_progress():Float
+	{
+		return (((HOUR_START) + ticksToHours(tick)) % HOURS_PER_DAY) / HOURS_PER_DAY;
 	}
 }
