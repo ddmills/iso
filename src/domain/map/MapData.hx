@@ -1,6 +1,5 @@
 package domain.map;
 
-import common.struct.FloatPoint;
 import common.struct.Grid;
 
 class MapData
@@ -56,7 +55,7 @@ class MapData
 
 		var tile = data.get(x, y);
 
-		if (z > tile.tileHeight)
+		if (z > tile.height)
 		{
 			return EMPTY;
 		}

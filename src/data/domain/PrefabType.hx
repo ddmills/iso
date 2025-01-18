@@ -1,3 +1,6 @@
 package data.domain;
 
-enum PrefabType {}
+enum PrefabType
+{
+	TREE_PALM;
+}

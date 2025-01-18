@@ -31,7 +31,7 @@ class MapGenerator
 
 		for (tile in map.data)
 		{
-			tile.value.height = p.get(tile.x, tile.y, 30, 8);
+			tile.value.realHeight = p.get(tile.x, tile.y, 30, 8);
 		}
 	}
 
@@ -39,9 +39,9 @@ class MapGenerator
 	{
 		for (tile in map.data)
 		{
-			var r = heightToTerrain(tile.value.height);
+			var r = heightToTerrain(tile.value.realHeight);
 			tile.value.terrain = r.terrain;
-			tile.value.tileHeight = r.tileHeight;
+			tile.value.height = r.tileHeight;
 		}
 	}
 

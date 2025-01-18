@@ -2,12 +2,15 @@ package data.domain;
 
 import common.struct.DataRegistry;
 import common.struct.FloatPoint3;
+import domain.prefabs.TreePalmPrefab;
 
 class PrefabRegistry extends DataRegistry<PrefabType, Prefab>
 {
 	public function new()
 	{
 		super();
+
+		register(TREE_PALM, new TreePalmPrefab());
 	}
 
 	public function spawn(type:PrefabType, ?pos:FloatPoint3, ?options:Dynamic)

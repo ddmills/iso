@@ -9,14 +9,17 @@ import core.Screen;
 import core.input.Command;
 import core.input.KeyCode;
 import data.Data;
+import data.domain.Prefab;
 import data.resources.TileKey;
 import domain.components.Sprite;
 import domain.map.MapData;
 import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Graphics;
+import hxsl.Types.Vec;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
+import shaders.WaterlineShader;
 
 class PlayScreen extends Screen
 {
@@ -112,45 +115,9 @@ class PlayScreen extends Screen
 		var y = ray.y.floor() + .5;
 		var z = ray.z.floor();
 
-		var px = Projection.worldToPx(x, y);
+		var pos = new FloatPoint3(x, y, z);
 
-		var ob = new h2d.Object();
-		ob.x = px.x;
-		ob.y = px.y;
-
-		// var tk = world.rand.pick([TileKey.TK_TREE_PALM_1]);
-		var tk = world.rand.pick([TileKey.TK_TREE_PALM_1, TileKey.TK_TREE_PALM_2, TK_TREE_PALM_3]);
-		// var tk = TileKey.TK_CUBE;
-		// var tile = Data.Tiles.get(tk);
-		// var drawable = new Bitmap(tile, ob);
-
-		// var originY = .9;
-
-		// // var zOffset = -((z / world.map.depth) * (MapData.BLOCK_H));
-		// var zOffset = -(z * MapData.BLOCK_H);
-		// var originOffsetA = -(originY * tile.height);
-
-		// trace(z, world.map.depth, zOffset);
-
-		// drawable.x = -(tile.width / 2); // offset for height
-		// drawable.y = zOffset + originOffsetA; // offset for height
-
-		// world.map.ob.add(ob, 0);
-		// var b = drawable.getBounds(ob);
-		// debugGraphics.endFill();
-		// debugGraphics.drawRect(ob.x + drawable.x, ob.y + drawable.y, b.width, b.height);
-		// debugGraphics.beginFill(0xFF7300, 1);
-		// debugGraphics.drawCircle(ob.x, ob.y, 2);
-		// debugGraphics.beginFill(0x00B7FF, 1);
-		// debugGraphics.drawCircle(ob.x + drawable.x, ob.y + drawable.y, 2);
-		// debugGraphics.lineStyle(2, 0xFF00FF, .1);
-		// debugGraphics.endFill();
-
-		var e = new Entity();
-		var sprite = new Sprite(tk);
-		sprite.origin = new FloatPoint(.5, .9);
-		e.add(sprite);
-		e.pos = new FloatPoint3(x, y, z);
+		Prefab.Spawn(TREE_PALM, pos);
 	}
 
 	override function onKeyDown(key:KeyCode)

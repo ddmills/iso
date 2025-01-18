@@ -5,8 +5,8 @@ class MapTile
 {
 	public var terrain:TerrainType;
 	public var idx:Int;
-	public var height:Float;
-	public var tileHeight:Int;
+	public var realHeight:Float;
+	public var height:Int;
 
 	public var map(default, null):MapData;
 	public var x(get, never):Int;

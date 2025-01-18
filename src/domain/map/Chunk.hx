@@ -8,13 +8,16 @@ import common.struct.IntPoint;
 import common.util.Projection;
 import core.Game;
 import data.Data;
+import data.domain.Prefab;
 import data.resources.TileKey;
+import data.resources.TileRegistry;
 import domain.components.Sprite;
 import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Object;
 import hxsl.Types.Vec;
 import shaders.WaterShader;
+import shaders.WaterlineShader;
 
 typedef RenderCell =
 {
@@ -74,17 +77,14 @@ class Chunk
 				var wy = worldPos.y + y;
 				updateTerrainBm(wx, wy);
 
-				var tree = p.get(wx, wy, 5, 20) > .65;
+				var tree = p.get(wx, wy, 8, 20) > .5;
 				var cell = map.get(wx, wy);
+				var chance = Game.instance.world.rand.bool(.5);
 
-				if ((cell.terrain == GRASS || cell.terrain == SAND) && tree)
+				if ((cell.terrain == GRASS || cell.terrain == SAND) && chance && tree)
 				{
-					var tk = Game.instance.world.rand.pick([TileKey.TK_TREE_PALM_1, TileKey.TK_TREE_PALM_2, TK_TREE_PALM_3]);
-					var e = new Entity();
-					var sprite = new Sprite(tk);
-					sprite.origin = new FloatPoint(.5, .9);
-					e.add(sprite);
-					e.pos = new FloatPoint3(wx + .5, wy + .5, cell.tileHeight);
+					var pos = new FloatPoint3(wx + .5, wy + .5, cell.height);
+					Prefab.Spawn(TREE_PALM, pos);
 				}
 			}
 		}
@@ -118,7 +118,7 @@ class Chunk
 			return;
 		}
 
-		for (z in 0...(t.tileHeight + 1))
+		for (z in 0...(t.height + 1))
 		{
 			var cell = bitmaps[z].get(wx, wy);
 
@@ -157,7 +157,7 @@ class Chunk
 			if (t.terrain == WATER)
 			{
 				var shader = new WaterShader();
-				shader.wpos = new Vec(wx, wy, 0);
+				shader.wpos = new Vec(wx, wy, z);
 				cell.bm.addShader(shader);
 			}
 			else

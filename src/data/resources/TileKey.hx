@@ -2,6 +2,7 @@ package data.resources;
 
 enum TileKey
 {
+	TK_CY;
 	TK_CUBE;
 	TK_UNKNOWN;
 	TK_WATER;
