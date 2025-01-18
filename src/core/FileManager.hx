@@ -2,7 +2,7 @@ package core;
 
 import common.tools.Performance;
 import common.util.FS;
-import domain.World.SaveWorld;
+import domain.World.WorldSave;
 import hxd.Save;
 import sys.FileSystem;
 
@@ -45,7 +45,7 @@ class FileManager
 	// 	return Save.load(null, name);
 	// }
 
-	public function saveWorld(data:SaveWorld)
+	public function saveWorld(data:WorldSave)
 	{
 		Performance.start('fs-world-save');
 		var isSaved = Save.save(data, filePath(['world']));
@@ -57,7 +57,7 @@ class FileManager
 		return isSaved;
 	}
 
-	public function tryReadWorld():SaveWorld
+	public function tryReadWorld():WorldSave
 	{
 		Performance.start('fs-world-load');
 		var name = filePath(['world']);

@@ -3,7 +3,6 @@ package domain.components;
 import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
 import common.util.Projection;
-import core.rendering.RenderLayerManager.RenderLayerType;
 import domain.map.MapData;
 import ecs.Component;
 import h2d.Graphics;
@@ -11,7 +10,6 @@ import shaders.SpriteShader;
 
 abstract class Drawable extends Component
 {
-	@save public var layer(default, null):RenderLayerType;
 	@save public var isVisible(default, set):Bool = true;
 	@save public var width(get, set):Float;
 	@save public var height(get, set):Float;
@@ -26,13 +24,13 @@ abstract class Drawable extends Component
 
 	private var debugGraphics:Graphics;
 
-	public function new(layer = OBJECTS)
+	public function new(origin:FloatPoint)
 	{
 		shader = new SpriteShader();
 		this.ob = new h2d.Object();
-		this.layer = layer;
-
 		worldPos = new FloatPoint3(0, 0, 0);
+
+		this.origin = origin;
 	}
 
 	abstract function getDrawable():h2d.Drawable;

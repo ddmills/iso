@@ -1,17 +1,20 @@
 package domain;
 
+import common.struct.FloatPoint3;
 import common.tools.Performance;
 import core.Game;
 import data.input.InputGroups;
-import domain.Clock.SaveClock;
+import domain.Clock.ClockSave;
+import domain.PlayerManager.PlayerSave;
 import domain.map.MapData;
 import domain.map.MapGenerator;
 import hxd.Rand;
 
-typedef SaveWorld =
+typedef WorldSave =
 {
 	public var seed:Int;
-	public var clock:SaveClock;
+	public var clock:ClockSave;
+	public var player:PlayerSave;
 }
 
 class World
@@ -19,6 +22,7 @@ class World
 	public var game(get, null):Game;
 	public var clock(default, null):Clock;
 	public var systems(default, null):SystemManager;
+	public var player(default, null):PlayerManager;
 	public var map(default, null):MapData;
 	public var seed:Int = 2;
 	public var rand:Rand;
@@ -28,6 +32,7 @@ class World
 	{
 		clock = new Clock();
 		systems = new SystemManager();
+		player = new PlayerManager();
 		input = new InputGroups();
 		map = new MapData();
 	}
@@ -50,6 +55,9 @@ class World
 		rand = new Rand(seed);
 
 		generateMap();
+
+		var pos = new FloatPoint3((map.width / 2).floor() + .5, (map.height / 2) + .5, 0);
+		player.create(pos);
 	}
 
 	public function generateMap()
@@ -65,23 +73,26 @@ class World
 		game.render(GROUND, map.ob);
 	}
 
-	public function load(data:SaveWorld)
+	public function load(data:WorldSave)
 	{
 		Performance.start('world-load');
+
 		seed = data.seed;
 		rand = new Rand(seed);
 		clock.load(data.clock);
+		player.load(data.player);
 
 		Performance.stop('world-load', true);
 	}
 
-	public function save(teardown:Bool = false):SaveWorld
+	public function save(teardown:Bool = false):WorldSave
 	{
 		Performance.start('world-save');
 
 		var s = {
 			seed: seed,
 			clock: clock.save(),
+			player: player.save(teardown),
 		};
 
 		Performance.stop('world-save', true);

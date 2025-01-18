@@ -1,6 +1,6 @@
 package domain.components;
 
-import core.rendering.RenderLayerManager.RenderLayerType;
+import common.struct.FloatPoint;
 import data.Data;
 import data.resources.TileKey;
 import h2d.Bitmap;
@@ -17,15 +17,14 @@ class Sprite extends Drawable
 	@save private var _width:Float = 32;
 	@save private var _height:Float = 32;
 
-	public function new(tileKey:TileKey, layer = OBJECTS)
+	public function new(tileKey:TileKey, ?origin:FloatPoint)
 	{
 		this.tileKey = tileKey;
-		super(layer);
 		_width = tile.width;
 		_height = tile.height;
+
+		super(origin);
 		bm = new Bitmap(tile, ob);
-		// bm.addShader(shader);
-		updatePos();
 	}
 
 	public function getBitmapClone():Bitmap

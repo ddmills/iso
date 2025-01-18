@@ -23,6 +23,7 @@ class TileRegistry extends DataRegistry<TileKey, Tile>
 		register(TK_TREE_PALM_1, terrain[2][1]);
 		register(TK_TREE_PALM_2, terrain[2][2]);
 		register(TK_TREE_PALM_3, terrain[2][3]);
-		register(TK_CY, terrain[4][2]);
+
+		register(TK_SHIP, hxd.Res.tiles.ship.toTile());
 	}
 }

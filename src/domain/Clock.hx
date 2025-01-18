@@ -1,9 +1,8 @@
 package domain;
 
 import core.Frame;
-import core.Game;
 
-typedef SaveClock =
+typedef ClockSave =
 {
 	tick:Float,
 	speed:Float,
@@ -39,7 +38,7 @@ class Clock
 		deltaTick = 0;
 	}
 
-	public function save():SaveClock
+	public function save():ClockSave
 	{
 		return {
 			tick: tick,
@@ -47,7 +46,7 @@ class Clock
 		}
 	}
 
-	public function load(save:SaveClock)
+	public function load(save:ClockSave)
 	{
 		_speed = save.speed;
 		tick = save.tick;
