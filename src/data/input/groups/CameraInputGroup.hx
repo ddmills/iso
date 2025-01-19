@@ -60,7 +60,8 @@ class CameraInputGroup
 			}
 			else
 			{
-				Game.instance.camera.focus = new Coordinate(follow.pos.x, follow.pos.y, WORLD);
+				var pos = follow.drawable?.pos ?? follow.pos;
+				Game.instance.camera.focus = new Coordinate(pos.x, pos.y, WORLD);
 			}
 		}
 	}

@@ -20,11 +20,19 @@ class Commands
 		cmd(INPUT_DOMAIN_DEFAULT,     CMD_SAVE,                KEY_S,         false,   true);
 		cmd(INPUT_DOMAIN_DEFAULT,     CMD_CONFIRM,             KEY_ENTER);
 		cmd(INPUT_DOMAIN_DEFAULT,     CMD_CANCEL,              KEY_ESCAPE);
-		cmd(INPUT_DOMAIN_PLAY,        CMD_PAUSE,               KEY_SPACE);
-		cmd(INPUT_DOMAIN_PLAY,        CMD_SPEED_1,             KEY_F1);
-		cmd(INPUT_DOMAIN_PLAY,        CMD_SPEED_2,             KEY_F2);
-		cmd(INPUT_DOMAIN_PLAY,        CMD_SPEED_3,             KEY_F3);
-		cmd(INPUT_DOMAIN_PLAY,        CMD_SPEED_4,             KEY_F4);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_NW,             KEY_NUMPAD_7);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_N,              KEY_UP);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_N,              KEY_NUMPAD_8);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_NE,             KEY_NUMPAD_9);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_W,              KEY_LEFT);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_W,              KEY_NUMPAD_4);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_E,              KEY_RIGHT);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_E,              KEY_NUMPAD_6);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_SW,             KEY_NUMPAD_1);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_S,              KEY_DOWN);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_S,              KEY_NUMPAD_2);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_MOVE_SE,             KEY_NUMPAD_3);
+		cmd(INPUT_DOMAIN_DEFAULT,     CMD_WAIT,                KEY_NUMPAD_5);
 		// @formatter:on
 	}
 

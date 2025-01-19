@@ -1,5 +1,6 @@
 package screens.play;
 
+import common.struct.Cardinal;
 import common.struct.Coordinate;
 import common.struct.FloatPoint3;
 import core.Frame;
@@ -7,6 +8,7 @@ import core.Screen;
 import core.input.Command;
 import core.input.KeyCode;
 import data.domain.Prefab;
+import domain.components.Move;
 import domain.systems.EnergySystem;
 import ecs.Entity;
 import screens.console.ConsoleScreen;
@@ -90,7 +92,7 @@ class PlayScreen extends Screen
 
 		var x = ray.x.floor() + .5;
 		var y = ray.y.floor() + .5;
-		var z = ray.z.floor() + 1;
+		var z = ray.z.floor();
 		var pos = new FloatPoint3(x, y, z);
 
 		if (game.input.lmb)
@@ -101,19 +103,20 @@ class PlayScreen extends Screen
 
 		if (game.input.rmb)
 		{
-			Prefab.Spawn(SHARK, pos);
+			// Prefab.Spawn(SHARK, pos);
+			Prefab.Spawn(TREE_PALM, pos);
 		}
 	}
 
 	override function onKeyDown(key:KeyCode)
 	{
-		if (key == KEY_R)
+		if (key == KEY_F1)
 		{
 			world.seed++;
 			world.generateMap();
 		}
 
-		if (key == KEY_D)
+		if (key == KEY_F2)
 		{
 			world.systems.sprites.debug = !world.systems.sprites.debug;
 		}
@@ -127,13 +130,42 @@ class PlayScreen extends Screen
 				game.screens.push(new ConsoleScreen());
 			case CMD_SAVE:
 				game.screens.push(new SaveScreen(true));
+			case CMD_MOVE_NW:
+				move(WEST);
+			case CMD_MOVE_N:
+				move(NORTH_WEST);
+			case CMD_MOVE_NE:
+				move(NORTH);
+			case CMD_MOVE_E:
+				move(NORTH_EAST);
+			case CMD_MOVE_W:
+				move(SOUTH_WEST);
+			case CMD_MOVE_SW:
+				move(SOUTH);
+			case CMD_MOVE_S:
+				move(SOUTH_EAST);
+			case CMD_MOVE_SE:
+				move(EAST);
+			case CMD_WAIT:
+				EnergySystem.ConsumeEnergy(world.player.entity, ACT_WAIT);
 			case _:
 		}
 	}
 
-	public override function onMouseMove(pos:Coordinate, previous:Coordinate)
+	private function move(dir:Cardinal)
 	{
-		// world.input.camera.onMouseMove(pos, previous);
+		var offset = dir.toOffset();
+		var target = world.player.ship_pos.add(offset.x, offset.y, 0);
+
+		if (world.map.isOutOfBounds(target.x.floor(), target.y.floor()))
+		{
+			return;
+		}
+
+		var speed = .2 * (!dir.isDiagonal() ? 1.59 : 1);
+		world.player.ship.add(new Move(target, speed, EASE_LINEAR));
+		EnergySystem.ConsumeEnergy(world.player.entity, ACT_MOVE);
+		trace('move to ${target.toString()}');
 	}
 
 	public override function onMouseWheelDown(wheelDelta:Float)

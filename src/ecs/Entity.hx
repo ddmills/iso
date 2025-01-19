@@ -109,7 +109,7 @@ class Entity
 		if (Std.isOfType(component, Drawable))
 		{
 			drawable = cast component;
-			drawable.worldPos = pos;
+			drawable.updatePos();
 		}
 
 		if (isCandidacyEnabled)
@@ -231,7 +231,7 @@ class Entity
 
 		if (drawable != null)
 		{
-			drawable.worldPos = value;
+			drawable.updatePos();
 		}
 
 		return value;

@@ -17,4 +17,9 @@ package common.struct;
 	{
 		return '($x,$y,$z)';
 	}
+
+	public static inline function Zero():FloatPoint3
+	{
+		return new FloatPoint3(0, 0, 0);
+	}
 }

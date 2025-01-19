@@ -14,7 +14,7 @@ abstract class Drawable extends Component
 	@save public var width(get, set):Float;
 	@save public var height(get, set):Float;
 	@save public var origin(default, set):FloatPoint = new FloatPoint(.5, .5);
-	@save public var worldPos(default, set):FloatPoint3;
+	@save public var pos(default, set):FloatPoint3;
 
 	public var ob(default, null):h2d.Object;
 	public var shader(default, null):SpriteShader;
@@ -28,7 +28,7 @@ abstract class Drawable extends Component
 	{
 		shader = new SpriteShader();
 		this.ob = new h2d.Object();
-		worldPos = new FloatPoint3(0, 0, 0);
+		pos = null;
 
 		this.origin = origin;
 	}
@@ -45,7 +45,8 @@ abstract class Drawable extends Component
 
 	public function updatePos()
 	{
-		var px = Projection.worldToPx(worldPos.x, worldPos.y);
+		var p = pos ?? entity?.pos ?? FloatPoint3.Zero();
+		var px = Projection.worldToPx(p.x, p.y);
 
 		ob.x = px.x;
 		ob.y = px.y;
@@ -54,10 +55,11 @@ abstract class Drawable extends Component
 		{
 			var originOffsetX = -(origin.x * getWidth());
 			var originOffsetY = -(origin.y * getHeight());
-			var zOffset = -(worldPos.z * MapData.BLOCK_H);
+			var zOffset = -(p.z * MapData.BLOCK_H);
 
 			drawable.x = originOffsetX;
 			drawable.y = originOffsetY + zOffset;
+			redrawDebug();
 		}
 	}
 
@@ -106,14 +108,27 @@ abstract class Drawable extends Component
 
 	function set_debug(value:Bool):Bool
 	{
-		if (value)
+		debug = value;
+		redrawDebug();
+		return value;
+	}
+
+	function redrawDebug()
+	{
+		if (debug)
 		{
+			if (debugGraphics != null)
+			{
+				debugGraphics.clear();
+			}
+
 			var b = drawable.getBounds(ob);
 
-			var zOffset = -(worldPos.z * MapData.BLOCK_H);
+			var p = pos ?? entity.pos ?? FloatPoint3.Zero();
+			var zOffset = -(p.z * MapData.BLOCK_H);
 
 			debugGraphics = new Graphics(ob);
-			debugGraphics.lineStyle(1, 0xFF00FF, .1);
+			debugGraphics.lineStyle(1, 0xFF00FF, .4);
 			debugGraphics.drawRect(drawable.x, drawable.y, b.width, b.height);
 			debugGraphics.beginFill(0xFF7300, 1);
 			debugGraphics.lineStyle(2, 0xFF00FF, 0);
@@ -126,13 +141,11 @@ abstract class Drawable extends Component
 			debugGraphics?.remove();
 			debugGraphics = null;
 		}
-
-		return debug = value;
 	}
 
-	function set_worldPos(value:FloatPoint3):FloatPoint3
+	function set_pos(value:FloatPoint3):FloatPoint3
 	{
-		worldPos = value;
+		pos = value;
 		updatePos();
 		return value;
 	}

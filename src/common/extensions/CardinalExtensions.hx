@@ -34,4 +34,9 @@ class CardinalExtensions
 			case SOUTH_EAST: {x: 1, y: 1};
 		}
 	}
+
+	public static function isDiagonal(cardinal:Cardinal):Bool
+	{
+		return cardinal == NORTH || cardinal == EAST || cardinal == SOUTH || cardinal == WEST;
+	}
 }

@@ -8,9 +8,14 @@ enum abstract CommandType(String) to String
 	var CMD_CYCLE_INPUT_REVERSE = 'tab input (reverse)';
 	var CMD_CANCEL = 'cancel';
 	var CMD_CONSOLE = 'open console';
-	var CMD_PAUSE = 'pause';
-	var CMD_SPEED_1 = 'set speed 1';
-	var CMD_SPEED_2 = 'set speed 2';
-	var CMD_SPEED_3 = 'set speed 3';
-	var CMD_SPEED_4 = 'set speed 4';
+
+	var CMD_WAIT = 'wait';
+	var CMD_MOVE_NW = 'move north west';
+	var CMD_MOVE_N = 'move north';
+	var CMD_MOVE_NE = 'move north east';
+	var CMD_MOVE_W = 'move west';
+	var CMD_MOVE_E = 'move east';
+	var CMD_MOVE_SW = 'move south west';
+	var CMD_MOVE_S = 'move south';
+	var CMD_MOVE_SE = 'move south east';
 }
