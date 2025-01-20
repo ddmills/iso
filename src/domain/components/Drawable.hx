@@ -3,6 +3,7 @@ package domain.components;
 import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
 import common.util.Projection;
+import core.Game;
 import domain.map.MapData;
 import ecs.Component;
 import h2d.Graphics;
@@ -46,10 +47,12 @@ abstract class Drawable extends Component
 	public function updatePos()
 	{
 		var p = pos ?? entity?.pos ?? FloatPoint3.Zero();
-		var px = Projection.worldToPx(p.x, p.y);
+		var px = Projection.worldToPx(p);
 
-		ob.x = px.x;
-		ob.y = px.y;
+		var buffer = .001 * p.z;
+
+		ob.x = px.x + buffer;
+		ob.y = px.y + buffer;
 
 		if (drawable != null)
 		{
@@ -57,8 +60,8 @@ abstract class Drawable extends Component
 			var originOffsetY = -(origin.y * getHeight());
 			var zOffset = -(p.z * MapData.BLOCK_H);
 
-			drawable.x = originOffsetX;
-			drawable.y = originOffsetY + zOffset;
+			drawable.x = originOffsetX - buffer;
+			drawable.y = originOffsetY + zOffset - buffer;
 			redrawDebug();
 		}
 	}
@@ -127,14 +130,15 @@ abstract class Drawable extends Component
 			var p = pos ?? entity.pos ?? FloatPoint3.Zero();
 			var zOffset = -(p.z * MapData.BLOCK_H);
 
-			debugGraphics = new Graphics(ob);
+			debugGraphics = new Graphics();
+			// Game.instance.world.map.ob.add(debugGraphics, -1);
 			debugGraphics.lineStyle(1, 0xFF00FF, .4);
-			debugGraphics.drawRect(drawable.x, drawable.y, b.width, b.height);
+			debugGraphics.drawRect(ob.x + drawable.x, ob.y + drawable.y, b.width, b.height);
 			debugGraphics.beginFill(0xFF7300, 1);
 			debugGraphics.lineStyle(2, 0xFF00FF, 0);
-			debugGraphics.drawCircle(0, 0, 3);
+			debugGraphics.drawCircle(ob.x, ob.y, 3);
 			debugGraphics.beginFill(0x00B7FF, 1);
-			debugGraphics.drawCircle(0, zOffset, 2);
+			debugGraphics.drawCircle(ob.x, ob.y + zOffset, 2);
 		}
 		else
 		{

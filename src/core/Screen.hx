@@ -1,6 +1,6 @@
 package core;
 
-import common.struct.Coordinate;
+import common.struct.FloatPoint;
 import core.input.KeyCode;
 import data.input.InputDomainType;
 import domain.World;
@@ -72,19 +72,19 @@ class Screen
 	 * Handle mouse click down
 	 */
 	@:allow(core.input.InputManager)
-	function onMouseDown(pos:Coordinate) {}
+	function onMouseDown(mousePos:FloatPoint) {}
 
 	/**
 	 * Handle mouse click up
 	 */
 	@:allow(core.input.InputManager)
-	function onMouseUp(pos:Coordinate) {}
+	function onMouseUp(mousePos:FloatPoint) {}
 
 	/**
 	 * Handle mouse moved
 	 */
 	@:allow(core.input.InputManager)
-	function onMouseMove(pos:Coordinate, previous:Coordinate) {}
+	function onMouseMove(mousePos:FloatPoint, previousMousePos:FloatPoint) {}
 
 	/**
 	 * Handle mouse wheel up

@@ -1,5 +1,6 @@
 package domain.map;
 
+import common.rendering.IsometricLayer;
 import common.struct.Grid;
 
 class MapData
@@ -12,7 +13,7 @@ class MapData
 	public var height(default, null):Int;
 	public var depth:Int = 4;
 	public var raycast:Raycast;
-	public var ob:TerrainOb;
+	public var ob:IsometricLayer;
 	public var chunks:ChunkManager;
 
 	public static var TILE_W = 40;
@@ -31,7 +32,7 @@ class MapData
 		data = new Grid(width, height);
 		data.fillFn(idx -> new MapTile(idx, this));
 
-		ob = new TerrainOb(this);
+		ob = new IsometricLayer(this);
 		raycast = new Raycast(this);
 		chunks = new ChunkManager(this);
 	}

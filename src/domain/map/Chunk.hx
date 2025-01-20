@@ -14,6 +14,7 @@ import data.resources.TileRegistry;
 import domain.components.Sprite;
 import ecs.Entity;
 import h2d.Bitmap;
+import h2d.Graphics;
 import h2d.Object;
 import hxsl.Types.Vec;
 import shaders.WaterShader;
@@ -35,12 +36,15 @@ class Chunk
 
 	private var bitmaps:Array<Grid<RenderCell>>;
 	private var size:Int;
+	private var debugGraphics:Graphics;
 
 	public function new(chunkIdx:Int, map:MapData)
 	{
 		this.chunkIdx = chunkIdx;
 		this.map = map;
 		this.size = map.chunkSize;
+		this.debugGraphics = new Graphics();
+		// map.ob.add(debugGraphics, 1);
 
 		chunkPos = {
 			x: Math.floor(chunkIdx % map.chunkCountX),
@@ -83,7 +87,7 @@ class Chunk
 
 				if ((cell.terrain == GRASS || cell.terrain == SAND) && chance && tree)
 				{
-					var pos = new FloatPoint3(wx + .5, wy + .5, cell.height);
+					var pos = new FloatPoint3(wx + .5, wy + .5, cell.height + 1);
 					Prefab.Spawn(TREE_PALM, pos);
 				}
 			}
@@ -124,11 +128,13 @@ class Chunk
 
 			if (cell == null)
 			{
-				var px = Projection.worldToPx(wx + .5, wy + .5);
+				var p = new FloatPoint3(wx + .5, wy + .5, 0);
+				var px = Projection.worldToPx(p);
+				var buffer = .001 * z;
 
 				var ob = new Object();
 				ob.x = px.x;
-				ob.y = px.y;
+				ob.y = px.y + buffer;
 
 				var bm = new Bitmap(ob);
 				bm.width = MapData.TILE_W;
@@ -136,11 +142,19 @@ class Chunk
 				bm.x = -MapData.TILE_W_HALF;
 
 				var originOffset = -(MapData.TILE_H / 2);
+				// var originOffset = -(.75 * MapData.TILE_H);
 				var zOffset = -(z * MapData.BLOCK_H);
 
-				bm.y = originOffset + zOffset;
+				bm.y = originOffset + zOffset - buffer;
 
-				map.ob.add(ob, 0);
+				// map.ob.add(ob, 0);
+
+				debugGraphics.beginFill(0xB3FF00, 1);
+				debugGraphics.lineStyle(1, 0xFF00FF, .5);
+				debugGraphics.drawCircle(ob.x, ob.y, 1);
+				// debugGraphics.beginFill(0xFF00BF, 1);
+				// debugGraphics.drawCircle(ob.x, ob.y + zOffset, 2);
+				debugGraphics.endFill();
 
 				cell = {
 					bm: bm,

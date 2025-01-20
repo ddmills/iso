@@ -25,9 +25,8 @@ class Raycast
 	function screenToWorld(sx:Int, sy:Int, z:Int):FloatPoint3
 	{
 		var camera = Game.instance.camera;
-		var camPx = Projection.worldToPx(camera.x, camera.y).toIntPoint();
-		var px = (camPx.x + (sx / camera.zoom)).floor();
-		var py = (camPx.y + (sy / camera.zoom)).floor() + (z * MapData.BLOCK_H);
+		var px = (camera.pos.x + (sx / camera.scale)).floor();
+		var py = (camera.pos.y + (sy / camera.scale)).floor() + (z * MapData.BLOCK_H);
 
 		var wx = (px / MapData.TILE_W_HALF + py / MapData.BLOCK_H) / 2;
 		var wy = (py / MapData.BLOCK_H - px / MapData.TILE_W_HALF) / 2;

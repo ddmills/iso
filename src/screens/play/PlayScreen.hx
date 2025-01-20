@@ -1,16 +1,22 @@
 package screens.play;
 
+import common.rendering.IsometricLayer;
+import common.rendering.IsometricObject;
 import common.struct.Cardinal;
-import common.struct.Coordinate;
 import common.struct.FloatPoint3;
+import common.struct.FloatPoint;
+import common.tools.Performance;
 import core.Frame;
 import core.Screen;
 import core.input.Command;
 import core.input.KeyCode;
+import data.Data;
 import data.domain.Prefab;
 import domain.components.Move;
 import domain.systems.EnergySystem;
 import ecs.Entity;
+import h2d.Bitmap;
+import h2d.Object;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
 
@@ -28,7 +34,45 @@ class PlayScreen extends Screen
 	{
 		inputDomain = INPUT_DOMAIN_PLAY;
 		cursor = Prefab.Spawn(CURSOR);
-		world.input.camera.followEntity(world.player.ship);
+		// world.input.camera.followEntity(world.player.ship);
+		var layer = new IsometricLayer(world.map);
+		game.render(GROUND, layer);
+
+		var b1 = makeBlock(2, 2, 1, layer);
+		var b2 = makeBlock(2, 2, 0, layer);
+		var b3 = makeBlock(1, 2, 0, layer);
+
+		var b4 = makeBlock(4, 5, 0, layer);
+		var b5 = makeBlock(5, 6, 0, layer);
+
+		trace(layer.isBehind(b2, b1));
+		trace(layer.isBehind(b1, b2));
+
+		Performance.start('sort');
+		layer.sort();
+		Performance.stop('sort', true);
+	}
+
+	function makeBlock(x:Float, y:Float, z:Float, layer:IsometricLayer):IsometricObject
+	{
+		var block = new IsometricObject();
+		var tile = Data.Tiles.get(TK_SAND);
+		var bm = new Bitmap(tile);
+		var ob = new Object();
+		bm.x = -(tile.width * .5);
+		bm.y = -(tile.height * .75);
+		ob.addChild(bm);
+
+		block.xx = 1;
+		block.yy = 1;
+		block.zz = 1;
+		block.pos = new FloatPoint3(x + .5, y + .5, z);
+
+		block.ob = ob;
+
+		layer.add(block);
+
+		return block;
 	}
 
 	override function onDestroy()
@@ -70,7 +114,6 @@ class PlayScreen extends Screen
 		{
 			cursor.drawable.isVisible = false;
 		}
-		world.map.ob.ysort(0);
 
 		while (game.commands.hasNext())
 		{
@@ -78,12 +121,14 @@ class PlayScreen extends Screen
 		}
 	}
 
-	override function onMouseDown(pos:Coordinate)
+	override function onMouseDown(screenPos:FloatPoint)
 	{
 		var sx = game.input.mouse.x.floor();
 		var sy = game.input.mouse.y.floor();
 
 		var ray = world.map.raycast.Get(sx, sy);
+
+		trace('ray!', ray.success, ray.x, ray.y, ray.z);
 
 		if (!ray.success)
 		{
@@ -92,7 +137,7 @@ class PlayScreen extends Screen
 
 		var x = ray.x.floor() + .5;
 		var y = ray.y.floor() + .5;
-		var z = ray.z.floor();
+		var z = ray.z.floor() + 1;
 		var pos = new FloatPoint3(x, y, z);
 
 		if (game.input.lmb)
@@ -166,6 +211,11 @@ class PlayScreen extends Screen
 		world.player.ship.add(new Move(target, speed, EASE_LINEAR));
 		EnergySystem.ConsumeEnergy(world.player.entity, ACT_MOVE);
 		trace('move to ${target.toString()}');
+	}
+
+	public override function onMouseMove(mousePos:FloatPoint, previousMousePos:FloatPoint)
+	{
+		world.input.camera.onMouseMove(mousePos, previousMousePos);
 	}
 
 	public override function onMouseWheelDown(wheelDelta:Float)

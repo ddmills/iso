@@ -58,7 +58,8 @@ class World
 
 		generateMap();
 
-		var pos = new FloatPoint3((map.width / 2).floor() + .5, (map.height / 2) + .5, 0);
+		// var pos = new FloatPoint3((map.width / 2).floor() + .5, (map.height / 2) + .5, 0);
+		var pos = new FloatPoint3(0 + .5, 0 + .5, 1);
 		player.create(pos);
 	}
 
@@ -72,7 +73,7 @@ class World
 			seed: seed
 		});
 
-		game.render(GROUND, map.ob);
+		// game.render(GROUND, map.ob);
 	}
 
 	public function load(data:WorldSave)

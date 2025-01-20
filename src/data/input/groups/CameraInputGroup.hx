@@ -1,6 +1,7 @@
 package data.input.groups;
 
-import common.struct.Coordinate;
+import common.struct.FloatPoint;
+import common.util.Projection;
 import core.Game;
 import ecs.Entity;
 
@@ -13,15 +14,14 @@ class CameraInputGroup
 		follow = null;
 	}
 
-	public function onMouseMove(pos:Coordinate, previous:Coordinate)
+	public function onMouseMove(screenPos:FloatPoint, previousScreenPos:FloatPoint)
 	{
 		var game = Game.instance;
 
 		if (game.input.mmb)
 		{
-			var diff = previous
-				.sub(pos)
-				.toFloatPoint()
+			var diff = previousScreenPos
+				.sub(screenPos)
 				.multiply(1);
 
 			game.camera.scroller.x -= diff.x;
@@ -34,15 +34,17 @@ class CameraInputGroup
 	public function onMouseWheelDown(wheelDelta:Float)
 	{
 		var game = Game.instance;
-		var z = (game.camera.zoom + .1).clamp(.1, 4);
-		game.camera.zoomTo(game.input.mouse, z);
+		var z = (game.camera.scale + .1).clamp(.1, 4);
+		var p = Projection.mouseToPx(game.input.mouse);
+		game.camera.focusToward(p, z);
 	}
 
 	public function onMouseWheelUp(wheelDelta:Float)
 	{
 		var game = Game.instance;
-		var z = (game.camera.zoom - .1).clamp(.1, 4);
-		game.camera.zoomTo(game.input.mouse, z);
+		var z = (game.camera.scale - .1).clamp(.1, 4);
+		var p = Projection.mouseToPx(game.input.mouse);
+		game.camera.focusToward(p, z);
 	}
 
 	public function followEntity(entity:Entity)
@@ -60,8 +62,8 @@ class CameraInputGroup
 			}
 			else
 			{
-				var pos = follow.drawable?.pos ?? follow.pos;
-				Game.instance.camera.focus = new Coordinate(pos.x, pos.y, WORLD);
+				// var pos = follow.drawable?.pos ?? follow.pos;
+				// Game.instance.camera.focus = new FloatPoint(pos.x, pos.y);
 			}
 		}
 	}

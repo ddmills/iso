@@ -1,16 +1,9 @@
 package common.util;
 
-import common.struct.Coordinate;
+import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
 import core.Game;
 import domain.map.MapData;
-
-enum Space
-{
-	SCREEN;
-	PIXEL;
-	WORLD;
-}
 
 class Projection
 {
@@ -21,44 +14,38 @@ class Projection
 		return Game.instance;
 	}
 
-	public static function worldToPx(wx:Float, wy:Float):FloatPoint
+	/**
+	 * Convert mouse coordinates (zero to window size) to px coordinates from origin
+	 * taking into account the camera scale.
+	 */
+	public static function mouseToPx(mouse:FloatPoint):FloatPoint
 	{
-		return new FloatPoint((wx - wy) * MapData.TILE_W_HALF, (wx + wy) * MapData.BLOCK_H);
+		var c = game.camera;
+
+		return {
+			x: c.pos.x + (mouse.x / c.scale),
+			y: c.pos.y + (mouse.y / c.scale),
+		};
 	}
 
-	public static function pxToWorld(px:Float, py:Float):Coordinate
+	public static function worldToPx(p:FloatPoint3):FloatPoint
 	{
-		var wx = (px / MapData.TILE_W_HALF + py / MapData.BLOCK_H) / 2;
-		var wy = (py / MapData.BLOCK_H - px / MapData.TILE_W_HALF) / 2;
+		var x = (p.x - p.y) * MapData.TILE_W_HALF;
+		var y = (p.x + p.y - p.z) * MapData.BLOCK_H;
 
-		return new Coordinate(wx, wy, WORLD);
+		return new FloatPoint(x, y);
 	}
 
-	public static function screenToPx(sx:Float, sy:Float):Coordinate
+	public static function pxToWorld(p:FloatPoint, z:Float):FloatPoint3
 	{
-		var camPix = worldToPx(game.camera.x, game.camera.y);
-		var px = camPix.x + (sx / game.camera.zoom);
-		var py = camPix.y + (sy / game.camera.zoom);
-		return new Coordinate(px, py, PIXEL);
+		var x = ((p.y + (z * MapData.BLOCK_H)) / MapData.BLOCK_H + p.x / MapData.TILE_W_HALF) / 2;
+		var y = ((p.y + (z * MapData.BLOCK_H)) / MapData.BLOCK_H - p.x / MapData.TILE_W_HALF) / 2;
+
+		return new FloatPoint3(x, y, z);
 	}
 
-	public static function pxToScreen(px:Float, py:Float):Coordinate
+	public static function mouseToWorld(p:FloatPoint, z:Float):FloatPoint3
 	{
-		var camPix = worldToPx(game.camera.x, game.camera.y);
-		var sx = (px - camPix.x) * game.camera.zoom;
-		var sy = (py - camPix.y) * game.camera.zoom;
-		return new Coordinate(sx, sy, SCREEN);
-	}
-
-	public static function screenToWorld(sx:Float, sy:Float):Coordinate
-	{
-		var p = screenToPx(sx, sy);
-		return pxToWorld(p.x, p.y);
-	}
-
-	public static function worldToScreen(wx:Float, wy:Float):Coordinate
-	{
-		var px = worldToPx(wx, wy);
-		return pxToScreen(px.x, px.y);
+		return pxToWorld(mouseToPx(p), z);
 	}
 }

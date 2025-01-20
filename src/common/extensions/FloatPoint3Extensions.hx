@@ -130,4 +130,9 @@ class FloatPoint3Extensions
 	{
 		return b.sub(a).normalized();
 	}
+
+	static public inline function format(p:FloatPoint3, decimals:Int):String
+	{
+		return '(${p.x.format(decimals)}, ${p.y.format(decimals)}, ${p.z.format(decimals)})';
+	}
 }

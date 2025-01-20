@@ -12,7 +12,7 @@ class PlayerShipPrefab extends Prefab
 	{
 		var e = new Entity();
 
-		var sprite = new Sprite(TK_SHIP, new FloatPoint(.5, .7));
+		var sprite = new Sprite(TK_SHIP, new FloatPoint(.5, .8));
 		e.add(sprite);
 
 		return e;

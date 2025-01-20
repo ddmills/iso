@@ -1,6 +1,5 @@
 package common.extensions;
 
-import common.struct.Coordinate;
 import common.struct.FloatPoint;
 import common.struct.IntPoint;
 
@@ -30,7 +29,37 @@ class FloatPointExtensions
 		};
 	}
 
-	static public inline function floor(p:FloatPoint):IntPoint
+	static public overload extern inline function sub(a:FloatPoint, v:Float):FloatPoint
+	{
+		return new FloatPoint(a.x - v, a.y - v);
+	}
+
+	static public overload extern inline function sub(a:FloatPoint, x:Float, y:Float):FloatPoint
+	{
+		return new FloatPoint(a.x - x, a.y - y);
+	}
+
+	static public overload extern inline function sub(a:FloatPoint, b:FloatPoint):FloatPoint
+	{
+		return new FloatPoint(a.x - b.x, a.y - b.y);
+	}
+
+	static public overload extern inline function add(a:FloatPoint, v:Float):FloatPoint
+	{
+		return new FloatPoint(a.x + v, a.y + v);
+	}
+
+	static public overload extern inline function add(a:FloatPoint, x:Float, y:Float):FloatPoint
+	{
+		return new FloatPoint(a.x + x, a.y + y);
+	}
+
+	static public overload extern inline function add(a:FloatPoint, b:FloatPoint):FloatPoint
+	{
+		return new FloatPoint(a.x + b.x, a.y + b.y);
+	}
+
+	static public inline function floor(p:FloatPoint):FloatPoint
 	{
 		return {
 			x: p.x.floor(),
@@ -46,13 +75,13 @@ class FloatPointExtensions
 		};
 	}
 
-	static public inline function asWorld(p:FloatPoint)
-	{
-		return new Coordinate(p.x, p.y, WORLD);
-	}
-
 	static public inline function toIntPoint(p:FloatPoint)
 	{
 		return new IntPoint(p.x.floor(), p.y.floor());
+	}
+
+	static public inline function format(p:FloatPoint, decimals:Int):String
+	{
+		return '(${p.x.format(decimals)}, ${p.y.format(decimals)})';
 	}
 }

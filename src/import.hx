@@ -1,7 +1,6 @@
 #if !macro
 using common.extensions.ArrayExtensions;
 using common.extensions.CardinalExtensions;
-using common.extensions.CoordinateExtensions;
 using common.extensions.FloatEasingExtensions;
 using common.extensions.FloatExtensions;
 using common.extensions.FloatPoint3Extensions;

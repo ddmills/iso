@@ -67,6 +67,11 @@ class FloatExtensions
 
 	static public inline function format(n:Float, decimals:Int = 2):String
 	{
+		if (decimals == 0)
+		{
+			return n.round().toString();
+		}
+
 		n = Math.round(n * Math.pow(10, decimals));
 		var str = '' + n;
 		var len = str.length;

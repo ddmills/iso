@@ -21,11 +21,6 @@ package common.struct;
 		return other.x == point.x && other.y == point.y;
 	}
 
-	public function asWorld()
-	{
-		return new Coordinate(x, y, WORLD);
-	}
-
 	public function toString()
 	{
 		return '(${x},${y})';

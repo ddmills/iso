@@ -1,23 +1,32 @@
 package core;
 
-import common.struct.Coordinate;
-import common.util.Projection;
+import common.struct.FloatPoint;
 import h2d.Object;
 
 class Camera
 {
+	/**
+	 * Width of the window
+	 */
 	public var width(get, null):Float;
+
+	/**
+	 * Height of the window
+	 */
 	public var height(get, null):Float;
-	public var zoom(get, set):Float;
-	public var pos(get, set):Coordinate;
-	public var x(get, set):Float;
-	public var y(get, set):Float;
-	public var focus(get, set):Coordinate;
+
+	public var scale(get, set):Float;
+
+	/**
+	 * Position of the camera, in pixels, from the origin
+	 */
+	public var pos(get, set):FloatPoint;
+
 	public var scroller(get, null):h2d.Object;
 
 	public function new()
 	{
-		zoom = 2;
+		scale = 1;
 	}
 
 	inline function get_width():Float
@@ -30,94 +39,55 @@ class Camera
 		return hxd.Window.getInstance().height;
 	}
 
-	function get_scroller():Object
+	inline function get_scroller():Object
 	{
 		return Game.instance.layers.scroller;
 	}
 
-	function get_x():Float
+	function set_pos(value:FloatPoint):FloatPoint
 	{
-		var c = Projection.pxToWorld(-scroller.x / zoom, -scroller.y / zoom);
-
-		return c.x;
-	}
-
-	function get_y():Float
-	{
-		var c = Projection.pxToWorld(-scroller.x / zoom, -scroller.y / zoom);
-
-		return c.y;
-	}
-
-	function set_x(value:Float):Float
-	{
-		var p = Projection.worldToPx(value, y);
-
-		scroller.x = -(p.x * zoom).floor();
-		scroller.y = -(p.y * zoom).floor();
-
+		scroller.x = -(value.x * scale);
+		scroller.y = -(value.y * scale);
 		return value;
 	}
 
-	function set_y(value:Float):Float
+	inline function get_pos():FloatPoint
 	{
-		var p = Projection.worldToPx(x, value);
-
-		scroller.x = -(p.x * zoom).floor();
-		scroller.y = -(p.y * zoom).floor();
-
-		return value;
+		return {
+			x: -(scroller.x / scale),
+			y: -(scroller.y / scale),
+		};
 	}
 
-	function get_pos():Coordinate
-	{
-		return new Coordinate(x, y, WORLD);
-	}
-
-	function set_pos(value:Coordinate):Coordinate
-	{
-		var w = value.toWorld();
-		x = w.x;
-		y = w.y;
-		return w;
-	}
-
-	function get_zoom():Float
+	inline function get_scale():Float
 	{
 		return scroller.scaleX;
 	}
 
-	function set_zoom(value:Float):Float
+	function set_scale(value:Float):Float
 	{
 		scroller.setScale(value);
 
 		return value;
 	}
 
-	public function zoomTo(tpos:Coordinate, value:Float):Float
+	public function focusToward(pxFocus:FloatPoint, scale:Float)
 	{
-		var ratio = 1 - (value / zoom);
-		var screenPos = tpos.toScreen();
+		var ratio = 1 - (scale / this.scale);
 
-		scroller.x += (screenPos.x - scroller.x) * ratio;
-		scroller.y += (screenPos.y - scroller.y) * ratio;
+		scroller.x += (pxFocus.x - scroller.x) * ratio;
+		scroller.y += (pxFocus.y - scroller.y) * ratio;
 
-		scroller.setScale(value);
-
-		return value;
+		scroller.setScale(scale);
 	}
 
-	function set_focus(value:Coordinate):Coordinate
+	public function focus(pxFocus:FloatPoint):FloatPoint
 	{
-		var mid = new Coordinate(width / 2, height / 2, SCREEN);
-
-		pos = value.sub(mid).add(pos);
+		pos = {
+			x: (pxFocus.x - (width / 2)) + pos.x,
+			y: (pxFocus.y - (height / 2)) + pos.y,
+		};
 
 		return pos;
-	}
-
-	function get_focus():Coordinate
-	{
-		return new Coordinate(width / 2, height / 2, SCREEN);
 	}
 }

@@ -1,12 +1,17 @@
 package core.input;
 
-import common.struct.Coordinate;
+import common.struct.FloatPoint;
 import common.struct.Queue;
 
 class InputManager
 {
 	public var queue:Queue<KeyEvent>;
-	public var mouse:Coordinate;
+
+	/**
+	 * Position of the pointer on the screen, in pixels, between 0 and window size
+	 */
+	public var mouse:FloatPoint;
+
 	public var modShift:Bool = false;
 	public var modCtrl:Bool = false;
 	public var modAlt:Bool = false;
@@ -18,7 +23,7 @@ class InputManager
 	{
 		queue = new Queue();
 		queue.maxLength = 4;
-		mouse = new Coordinate(0, 0, SCREEN);
+		mouse = new FloatPoint(0, 0);
 		Game.instance.window.addEventTarget(onSceneEvent);
 	}
 
@@ -74,7 +79,7 @@ class InputManager
 		{
 			case EMove:
 				var previous = mouse;
-				mouse = new Coordinate(event.relX, event.relY, SCREEN);
+				mouse = new FloatPoint(event.relX, event.relY);
 				Game.instance.screens.current.onMouseMove(mouse, previous);
 			case EKeyUp:
 				setModKeys(event.keyCode, KEY_UP);
@@ -92,7 +97,7 @@ class InputManager
 					case 2:
 						mmb = true;
 				}
-				Game.instance.screens.current.onMouseDown(new Coordinate(event.relX, event.relY, SCREEN));
+				Game.instance.screens.current.onMouseDown(new FloatPoint(event.relX, event.relY));
 			case ERelease:
 				switch (event.button)
 				{
@@ -103,7 +108,7 @@ class InputManager
 					case 2:
 						mmb = false;
 				}
-				Game.instance.screens.current.onMouseUp(new Coordinate(event.relX, event.relY, SCREEN));
+				Game.instance.screens.current.onMouseUp(new FloatPoint(event.relX, event.relY));
 			case EWheel:
 				if (event.wheelDelta > 0)
 				{

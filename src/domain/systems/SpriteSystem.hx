@@ -25,7 +25,7 @@ class SpriteSytem extends System
 	{
 		if (drawable != null)
 		{
-			world.map.ob.add(drawable.ob, 0);
+			// world.map.ob.add(drawable.ob, 0);
 			drawable.debug = debug;
 		}
 	}
