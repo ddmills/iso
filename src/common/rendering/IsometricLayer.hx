@@ -16,14 +16,14 @@ class IsometricLayer extends Object
 
 	public function add(iso:IsometricObject)
 	{
-		isoObjects.push(iso);
 		var idx = children.length;
-		iso.idx = idx;
+		isoObjects.push(iso);
+		addChildAt(iso.ob, idx);
 
 		var px = Projection.worldToPx(iso.pos);
 		iso.ob.x = px.x;
 		iso.ob.y = px.y;
-		addChildAt(iso.ob, idx);
+		iso.idx = idx;
 	}
 
 	private function intervalOverlap(a1:Float, a2:Float, b1:Float, b2:Float):Bool
@@ -43,53 +43,119 @@ class IsometricLayer extends Object
 		return overlap(a, b) && (a.x + a.xx <= b.x || a.y + a.yy <= b.y || a.z + a.zz <= b.z);
 	}
 
+	// override function removeChild(s:Object)
+	// {
+	// 	for (i in 0...isoObjects.length)
+	// 	{
+	// 		if (children[i] == s)
+	// 		{
+	// 			children.splice(i, 1);
+	// 			if (s.allocated)
+	// 				s.onRemove();
+	// 			s.parent = null;
+	// 			s.posChanged = true;
+	// 			if (s.parentContainer != null)
+	// 				s.setParentContainer(null);
+	// 			var k = layerCount - 1;
+	// 			while (k >= 0 && layersIndexes[k] > i)
+	// 			{
+	// 				layersIndexes[k]--;
+	// 				k--;
+	// 			}
+	// 			#if domkit
+	// 			if (s.dom != null)
+	// 				s.dom.onParentChanged();
+	// 			#end
+	// 			onContentChanged();
+	// 			break;
+	// 		}
+	// 	}
+	// }
+
 	public function sort()
 	{
-		var startIdx = 0;
-		var maxIdx = isoObjects.length;
-
-		if (startIdx == maxIdx)
+		var pivot = 0;
+		while (pivot < children.length)
 		{
-			return;
-		}
-
-		var idx = startIdx;
-		var ymax = isoObjects[idx++];
-
-		while (idx < maxIdx)
-		{
-			var o1 = isoObjects[idx];
-			if (isBehind(o1, ymax))
+			var newPivot = false;
+			for (i in pivot...children.length)
 			{
-				var p = idx - 1;
-
-				while (p >= startIdx)
+				var obj = isoObjects[i];
+				var parent = true;
+				for (j in pivot...children.length)
 				{
-					var o2 = isoObjects[p];
-
-					if (isBehind(o2, o1))
+					if (j == i)
 					{
-						break;
+						continue;
 					}
 
-					isoObjects[p + 1] = o2;
-					children[p + 1] = o2.ob;
-					p--;
+					var obj2 = isoObjects[j];
+					if (isBehind(obj2, obj))
+					{
+						parent = false;
+						break;
+					}
 				}
 
-				isoObjects[p + 1] = o1;
-				children[p + 1] = o1.ob;
-
-				if (o1.ob.allocated)
+				if (parent)
 				{
-					o1.ob.onHierarchyMoved(false);
+					isoObjects[i] = isoObjects[pivot];
+					isoObjects[pivot] = obj;
+					var child = children[i];
+					children[i] = children[pivot];
+					children[pivot] = child;
+					pivot++;
+					newPivot = true;
 				}
 			}
-			else
+			if (!newPivot)
 			{
-				ymax = o1;
+				pivot++;
 			}
-			idx++;
 		}
 	}
+
+	// public function sort()
+	// {
+	// 	var startIdx = 0;
+	// 	var maxIdx = isoObjects.length;
+	// 	if (startIdx == maxIdx)
+	// 	{
+	// 		return;
+	// 	}
+	// 	var idx = startIdx;
+	// 	var ymax = isoObjects[idx++];
+	// 	while (idx < maxIdx)
+	// 	{
+	// 		var o1 = isoObjects[idx];
+	// 		if (isBehind(o1, ymax))
+	// 		{
+	// 			var p = idx - 1;
+	// 			while (p >= startIdx)
+	// 			{
+	// 				var o2 = isoObjects[p];
+	// 				if (isBehind(o2, o1))
+	// 				{
+	// 					break;
+	// 				}
+	// 				trace('swap?');
+	// 				isoObjects[p + 1] = o2;
+	// 				children[p + 1] = o2.ob;
+	// 				p--;
+	// 			}
+	// 			isoObjects[p + 1] = o1;
+	// 			children[p + 1] = o1.ob;
+	// 			trace('swap');
+	// 			if (o1.ob.allocated)
+	// 			{
+	// 				o1.ob.onHierarchyMoved(false);
+	// 			}
+	// 		}
+	// 		else
+	// 		{
+	// 			ymax = o1;
+	// 		}
+	// 		idx++;
+	// 	}
+	// }
 }

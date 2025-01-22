@@ -15,10 +15,10 @@ class Projection
 	}
 
 	/**
-	 * Convert mouse coordinates (zero to window size) to px coordinates from origin
+	 * Convert mouse/screen coordinates (zero to window size) to px coordinates from origin
 	 * taking into account the camera scale.
 	 */
-	public static function mouseToPx(mouse:FloatPoint):FloatPoint
+	public static function screenToPx(mouse:FloatPoint):FloatPoint
 	{
 		var c = game.camera;
 
@@ -36,7 +36,7 @@ class Projection
 		return new FloatPoint(x, y);
 	}
 
-	public static function pxToWorld(p:FloatPoint, z:Float):FloatPoint3
+	public static function pxToWorld(p:FloatPoint, z:Float = 0):FloatPoint3
 	{
 		var x = ((p.y + (z * MapData.BLOCK_H)) / MapData.BLOCK_H + p.x / MapData.TILE_W_HALF) / 2;
 		var y = ((p.y + (z * MapData.BLOCK_H)) / MapData.BLOCK_H - p.x / MapData.TILE_W_HALF) / 2;
@@ -44,8 +44,8 @@ class Projection
 		return new FloatPoint3(x, y, z);
 	}
 
-	public static function mouseToWorld(p:FloatPoint, z:Float):FloatPoint3
+	public static function screenToWorld(p:FloatPoint, z:Float = 0):FloatPoint3
 	{
-		return pxToWorld(mouseToPx(p), z);
+		return pxToWorld(screenToPx(p), z);
 	}
 }

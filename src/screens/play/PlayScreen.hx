@@ -6,6 +6,7 @@ import common.struct.Cardinal;
 import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
 import common.tools.Performance;
+import common.util.Projection;
 import core.Frame;
 import core.Screen;
 import core.input.Command;
@@ -17,8 +18,10 @@ import domain.systems.EnergySystem;
 import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Object;
+import hxsl.Types.Vec;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
+import shaders.WaterlineShader;
 
 class PlayScreen extends Screen
 {
@@ -35,40 +38,47 @@ class PlayScreen extends Screen
 		inputDomain = INPUT_DOMAIN_PLAY;
 		cursor = Prefab.Spawn(CURSOR);
 		// world.input.camera.followEntity(world.player.ship);
-		var layer = new IsometricLayer(world.map);
+		var layer = world.map.ob;
 		game.render(GROUND, layer);
 
-		var b1 = makeBlock(2, 2, 1, layer);
-		var b2 = makeBlock(2, 2, 0, layer);
-		var b3 = makeBlock(1, 2, 0, layer);
+		// var b1 = makeBlock(2, 2, 1, layer);
+		// var b2 = makeBlock(2, 2, 0, layer);
+		// var b3 = makeBlock(1, 2, 0, layer);
 
-		var b4 = makeBlock(4, 5, 0, layer);
-		var b5 = makeBlock(5, 6, 0, layer);
+		// var b4 = makeBlock(4, 5, 0, layer);
+		// var b5 = makeBlock(5, 6, 0, layer);
 
-		trace(layer.isBehind(b2, b1));
-		trace(layer.isBehind(b1, b2));
+		// trace(layer.isBehind(b2, b1));
+		// trace(layer.isBehind(b1, b2));
 
-		Performance.start('sort');
-		layer.sort();
-		Performance.stop('sort', true);
+		// // Performance.start('sort');
+		// layer.sort();
+		// // Performance.stop('sort', true);
 	}
 
 	function makeBlock(x:Float, y:Float, z:Float, layer:IsometricLayer):IsometricObject
 	{
-		var block = new IsometricObject();
-		var tile = Data.Tiles.get(TK_SAND);
+		// var tile = Data.Tiles.get(TK_GRASS_H1);
+		var tile = hxd.Res.tiles.rock.toTile();
 		var bm = new Bitmap(tile);
 		var ob = new Object();
 		bm.x = -(tile.width * .5);
 		bm.y = -(tile.height * .75);
 		ob.addChild(bm);
 
-		block.xx = 1;
-		block.yy = 1;
-		block.zz = 1;
-		block.pos = new FloatPoint3(x + .5, y + .5, z);
+		var block = new IsometricObject(ob);
+		block.size = new FloatPoint3(1, 1, 1);
+		block.pos = new FloatPoint3(x, y, 0);
 
-		block.ob = ob;
+		var shader = new WaterlineShader();
+		shader.pos = new Vec(x, y, 0);
+		shader.size = new Vec(1, 1, 1);
+
+		var tex = hxd.Res.tiles.rock_height.toTexture();
+		tex.filter = Nearest;
+		shader.heightTexture = tex;
+
+		bm.addShader(shader);
 
 		layer.add(block);
 
@@ -126,9 +136,23 @@ class PlayScreen extends Screen
 		var sx = game.input.mouse.x.floor();
 		var sy = game.input.mouse.y.floor();
 
+		var p = Projection.screenToWorld(game.input.mouse).floor();
+
+		if (game.input.lmb)
+		{
+			makeBlock(p.x, p.y, p.z, world.map.ob);
+		}
+		if (game.input.rmb)
+		{
+			Performance.start('sort');
+			world.map.ob.sort();
+			Performance.stop('sort', true);
+		}
+		return;
+
 		var ray = world.map.raycast.Get(sx, sy);
 
-		trace('ray!', ray.success, ray.x, ray.y, ray.z);
+		// trace('ray!', ray.success, ray.x, ray.y, ray.z);
 
 		if (!ray.success)
 		{

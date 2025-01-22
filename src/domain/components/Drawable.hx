@@ -3,7 +3,6 @@ package domain.components;
 import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
 import common.util.Projection;
-import core.Game;
 import domain.map.MapData;
 import ecs.Component;
 import h2d.Graphics;

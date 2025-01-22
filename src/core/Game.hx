@@ -20,7 +20,7 @@ class Game
 
 	public var TILE_W_HALF(get, never):Int;
 	public var TILE_H_HALF(get, never):Int;
-	public var CLEAR_COLOR:ColorKey = ColorKey.C_BLACK;
+	public var CLEAR_COLOR:ColorKey = ColorKey.C_CLEAR;
 
 	public static var instance:Game;
 

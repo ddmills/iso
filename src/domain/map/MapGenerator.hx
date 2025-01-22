@@ -57,7 +57,7 @@ class MapGenerator
 			};
 		}
 
-		if (h < waterline + .01)
+		if (h < waterline + .02)
 		{
 			return {
 				terrain: SAND,
@@ -65,7 +65,7 @@ class MapGenerator
 			};
 		}
 
-		if (h < waterline + .015)
+		if (h < waterline + .025)
 		{
 			return {
 				terrain: SAND,
@@ -73,7 +73,7 @@ class MapGenerator
 			};
 		}
 
-		if (h < waterline + .02)
+		if (h < waterline + .03)
 		{
 			return {
 				terrain: STONE,

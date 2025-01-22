@@ -35,7 +35,7 @@ class CameraInputGroup
 	{
 		var game = Game.instance;
 		var z = (game.camera.scale + .1).clamp(.1, 4);
-		var p = Projection.mouseToPx(game.input.mouse);
+		var p = Projection.screenToPx(game.input.mouse);
 		game.camera.focusToward(p, z);
 	}
 
@@ -43,7 +43,7 @@ class CameraInputGroup
 	{
 		var game = Game.instance;
 		var z = (game.camera.scale - .1).clamp(.1, 4);
-		var p = Projection.mouseToPx(game.input.mouse);
+		var p = Projection.screenToPx(game.input.mouse);
 		game.camera.focusToward(p, z);
 	}
 

@@ -1,7 +1,6 @@
 package domain.systems;
 
 import common.struct.FloatPoint3;
-import common.struct.FloatPoint;
 import common.util.Projection;
 import core.Frame;
 import data.Data;
@@ -15,7 +14,7 @@ typedef DebugInfo =
 {
 	ob:Object,
 	fps:Text,
-	mousePos:Text,
+	screenPos:Text,
 	pixelPos:Text,
 	worldPos:Text,
 	clock:Text,
@@ -35,29 +34,30 @@ class DebugInfoSystem extends System
 
 	override function update(frame:Frame)
 	{
-		var mouse = game.input.mouse;
-		var pixel = Projection.mouseToPx(mouse);
-		var world = Projection.mouseToWorld(mouse, 1);
+		var screen = game.input.mouse;
+		var pixel = Projection.screenToPx(screen);
+		var world = Projection.screenToWorld(screen, 0);
+		var worldToPix = Projection.worldToPx(world);
 
-		// var w = game.input.mouse.toIntPoint();
-		// var px = game.input.mouse;
+		// var w = game.input.screen.toIntPoint();
+		// var px = game.input.screen;
 		// var wtext = w.toString();
 		var fps = frame.fps.floor();
 
-		// var sx = game.input.mouse.x.floor();
-		// var sy = game.input.mouse.y.floor();
+		// var sx = game.input.screen.x.floor();
+		// var sy = game.input.screen.y.floor();
 
 		// var ray = world.map.raycast.Get(sx, sy);
 		// var rayText = '[${ray.x.floor()}, ${ray.y.floor()}, ${ray.z.floor()}]';
 		// var terrainText = EnumValueTools.getName(ray.terrain);
 
-		// var w = Projection.mouseToPx(game.input.mouse);
+		// var w = Projection.screenToPx(game.input.screen);
 
 		debugInfo.fps.text = game.app.engine.fps.floor().toString() + ' ' + frame.fps.floor().toString();
 		debugInfo.fps.color = getFpsColor(fps).toHxdColor();
 
-		debugInfo.mousePos.text = 'mouse=${mouse}';
-		debugInfo.pixelPos.text = 'pixel=${pixel.format(0)}. scale=${game.camera.scale}';
+		debugInfo.screenPos.text = 'screen=${screen} scale=${game.camera.scale}';
+		debugInfo.pixelPos.text = 'pixel=${pixel.format(0)}. ${worldToPix.format(0)}';
 		debugInfo.worldPos.text = 'world=${world.format(1)}';
 
 		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
@@ -96,9 +96,9 @@ class DebugInfoSystem extends System
 		var fps = Data.Fonts.text(FNT_BIZCAT, ob);
 		fps.y = h;
 
-		var mousePos = Data.Fonts.text(FNT_BIZCAT, ob);
-		mousePos.color = ColorKey.C_WHITE.toHxdColor();
-		mousePos.y = h += 16;
+		var screenPos = Data.Fonts.text(FNT_BIZCAT, ob);
+		screenPos.color = ColorKey.C_WHITE.toHxdColor();
+		screenPos.y = h += 16;
 
 		var pixelPos = Data.Fonts.text(FNT_BIZCAT, ob);
 		pixelPos.color = ColorKey.C_WHITE.toHxdColor();
@@ -177,12 +177,12 @@ class DebugInfoSystem extends System
 			grid.lineTo(endPx.x, endPx.y);
 		}
 
-		game.render(GROUND, grid);
+		// game.render(GROUND, grid);
 
 		debugInfo = {
 			ob: ob,
 			fps: fps,
-			mousePos: mousePos,
+			screenPos: screenPos,
 			pixelPos: pixelPos,
 			worldPos: worldPos,
 			entities: entities,

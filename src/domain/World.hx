@@ -73,7 +73,7 @@ class World
 			seed: seed
 		});
 
-		// game.render(GROUND, map.ob);
+		game.render(GROUND, map.ob);
 	}
 
 	public function load(data:WorldSave)
