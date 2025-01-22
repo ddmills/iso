@@ -2,6 +2,7 @@ package common.extensions;
 
 import common.struct.FloatPoint;
 import common.struct.IntPoint;
+import hxsl.Types.Vec;
 
 class FloatPointExtensions
 {
@@ -78,6 +79,11 @@ class FloatPointExtensions
 	static public inline function toIntPoint(p:FloatPoint)
 	{
 		return new IntPoint(p.x.floor(), p.y.floor());
+	}
+
+	static public inline function toHxdVec(p:FloatPoint)
+	{
+		return new Vec(p.x, p.y);
 	}
 
 	static public inline function format(p:FloatPoint, decimals:Int):String

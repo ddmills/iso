@@ -3,7 +3,9 @@ package common.extensions;
 import common.algorithm.Distance;
 import common.struct.FloatPoint3;
 import common.struct.FloatPoint;
+import common.struct.IntPoint3;
 import common.util.Easing;
+import hxsl.Types.Vec;
 
 class FloatPoint3Extensions
 {
@@ -134,5 +136,30 @@ class FloatPoint3Extensions
 	static public inline function format(p:FloatPoint3, decimals:Int):String
 	{
 		return '(${p.x.format(decimals)}, ${p.y.format(decimals)}, ${p.z.format(decimals)})';
+	}
+
+	static public function toHxdVec(p:FloatPoint3):Vec
+	{
+		return new Vec(p.x, p.y, p.z);
+	}
+
+	static public function toIntPoint3(p:FloatPoint3):IntPoint3
+	{
+		return new IntPoint3(p.x.floor(), p.y.floor(), p.z.floor());
+	}
+
+	static public function withX(p:FloatPoint3, v:Float):FloatPoint3
+	{
+		return new FloatPoint3(v, p.y, p.z);
+	}
+
+	static public function withY(p:FloatPoint3, v:Float):FloatPoint3
+	{
+		return new FloatPoint3(p.x, v, p.z);
+	}
+
+	static public function withZ(p:FloatPoint3, v:Float):FloatPoint3
+	{
+		return new FloatPoint3(p.x, p.y, v);
 	}
 }

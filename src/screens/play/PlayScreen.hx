@@ -11,14 +11,12 @@ import core.Frame;
 import core.Screen;
 import core.input.Command;
 import core.input.KeyCode;
-import data.Data;
 import data.domain.Prefab;
 import domain.components.Move;
 import domain.systems.EnergySystem;
 import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Object;
-import hxsl.Types.Vec;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
 import shaders.WaterlineShader;
@@ -27,9 +25,7 @@ class PlayScreen extends Screen
 {
 	var cursor:Entity;
 
-	private var cursor_x:Int;
-	private var cursor_y:Int;
-	private var cursor_z:Int;
+	private var cursorPos:FloatPoint3;
 
 	public function new() {}
 
@@ -40,46 +36,36 @@ class PlayScreen extends Screen
 		// world.input.camera.followEntity(world.player.ship);
 		var layer = world.map.ob;
 		game.render(GROUND, layer);
-
-		// var b1 = makeBlock(2, 2, 1, layer);
-		// var b2 = makeBlock(2, 2, 0, layer);
-		// var b3 = makeBlock(1, 2, 0, layer);
-
-		// var b4 = makeBlock(4, 5, 0, layer);
-		// var b5 = makeBlock(5, 6, 0, layer);
-
-		// trace(layer.isBehind(b2, b1));
-		// trace(layer.isBehind(b1, b2));
-
-		// // Performance.start('sort');
-		// layer.sort();
-		// // Performance.stop('sort', true);
 	}
 
-	function makeBlock(x:Float, y:Float, z:Float, layer:IsometricLayer):IsometricObject
+	function makeBlock(pos:FloatPoint3, layer:IsometricLayer):IsometricObject
 	{
 		// var tile = Data.Tiles.get(TK_GRASS_H1);
-		var tile = hxd.Res.tiles.rock.toTile();
+		var tile = hxd.Res.tiles.cy.toTile();
 		var bm = new Bitmap(tile);
 		var ob = new Object();
-		bm.x = -(tile.width * .5);
-		bm.y = -(tile.height * .75);
+
+		var origin = new FloatPoint(.5, 35 / 40);
+
+		bm.x = -(tile.width * origin.x);
+		bm.y = -(tile.height * origin.y);
+
 		ob.addChild(bm);
 
 		var block = new IsometricObject(ob);
-		block.size = new FloatPoint3(1, 1, 1);
-		block.pos = new FloatPoint3(x, y, 0);
+		block.size = new FloatPoint3(.6, .6, 3);
+		block.pos = new FloatPoint3(pos.x + .5, pos.y + .5, pos.z);
 
 		var shader = new WaterlineShader();
-		shader.pos = new Vec(x, y, 0);
-		shader.size = new Vec(1, 1, 1);
+		shader.pos = block.pos.toHxdVec();
+		shader.size = block.size.toHxdVec();
+		shader.origin = origin.toHxdVec();
 
-		var tex = hxd.Res.tiles.rock_height.toTexture();
+		var tex = hxd.Res.tiles.cy_height.toTexture();
 		tex.filter = Nearest;
 		shader.heightTexture = tex;
 
 		bm.addShader(shader);
-
 		layer.add(block);
 
 		return block;
@@ -96,28 +82,20 @@ class PlayScreen extends Screen
 
 		world.input.camera.update();
 
-		var sx = game.input.mouse.x.floor();
-		var sy = game.input.mouse.y.floor();
-
-		var ray = world.map.raycast.Get(sx, sy);
+		var ray = world.map.raycast.Get(game.input.mouse.floor());
 
 		if (ray.success)
 		{
-			var x = ray.x.floor();
-			var y = ray.y.floor();
-			var z = ray.z.floor();
-
 			cursor.drawable.isVisible = true;
+			var rayPos = ray.pos.floor();
 
-			if (x != cursor_x || y != cursor_y || z != cursor_z)
+			if (rayPos.x != cursor.x.floor() || rayPos.y != cursor.y.floor() || rayPos.z != cursor.z.floor())
 			{
-				world.map.chunks.load(x, y);
+				cursorPos = rayPos;
 
-				cursor_x = x;
-				cursor_y = y;
-				cursor_z = z;
+				world.map.chunks.load(cursor.x.floor(), cursor.y.floor());
 
-				cursor.pos = new FloatPoint3(x + .5, y + .5, z);
+				cursor.pos = cursorPos.floor().add(.5, .5, 0);
 			}
 		}
 		else
@@ -133,36 +111,32 @@ class PlayScreen extends Screen
 
 	override function onMouseDown(screenPos:FloatPoint)
 	{
-		var sx = game.input.mouse.x.floor();
-		var sy = game.input.mouse.y.floor();
-
 		var p = Projection.screenToWorld(game.input.mouse).floor();
 
 		if (game.input.lmb)
 		{
-			makeBlock(p.x, p.y, p.z, world.map.ob);
+			var r = world.map.raycast.Get(game.input.mouse);
+			trace('raycast!', r.pos.floor());
+			makeBlock(r.pos.floor(), world.map.ob);
 		}
+
 		if (game.input.rmb)
 		{
 			Performance.start('sort');
 			world.map.ob.sort();
 			Performance.stop('sort', true);
 		}
+
 		return;
 
-		var ray = world.map.raycast.Get(sx, sy);
-
-		// trace('ray!', ray.success, ray.x, ray.y, ray.z);
+		var ray = world.map.raycast.Get(game.input.mouse);
 
 		if (!ray.success)
 		{
 			return;
 		}
 
-		var x = ray.x.floor() + .5;
-		var y = ray.y.floor() + .5;
-		var z = ray.z.floor() + 1;
-		var pos = new FloatPoint3(x, y, z);
+		var pos = ray.pos.floor().add(.5, .5, 1);
 
 		if (game.input.lmb)
 		{

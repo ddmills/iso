@@ -19,6 +19,7 @@ class WaterlineShader extends Shader
 			@borrow(h3d.shader.Base2d) var uvPos:Vec4;
 			@param var pos:Vec3;
 			@param var size:Vec3;
+			@param var origin:Vec2;
 			@param var heightTexture:Sampler2D;
 			function fragment()
 			{
@@ -48,7 +49,7 @@ class WaterlineShader extends Shader
 				// pixelColor.b = height;
 
 				var y_wave_factor = 1.2;
-				var x_wave_factor = 1.3;
+				var x_wave_factor = 0;
 				var speed = 1;
 
 				var s = (sin((time * speed) + (world.x * x_wave_factor) + (world.y * y_wave_factor)) + 1) / 2; // 0,1

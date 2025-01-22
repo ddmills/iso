@@ -9,6 +9,7 @@ import ecs.System;
 import h2d.Graphics;
 import h2d.Object;
 import h2d.Text;
+import haxe.EnumTools.EnumValueTools;
 
 typedef DebugInfo =
 {
@@ -36,8 +37,8 @@ class DebugInfoSystem extends System
 	{
 		var screen = game.input.mouse;
 		var pixel = Projection.screenToPx(screen);
-		var world = Projection.screenToWorld(screen, 0);
-		var worldToPix = Projection.worldToPx(world);
+		var wpos = Projection.screenToWorld(screen, 0);
+		var worldToPx = Projection.worldToPx(wpos);
 
 		// var w = game.input.screen.toIntPoint();
 		// var px = game.input.screen;
@@ -47,7 +48,7 @@ class DebugInfoSystem extends System
 		// var sx = game.input.screen.x.floor();
 		// var sy = game.input.screen.y.floor();
 
-		// var ray = world.map.raycast.Get(sx, sy);
+		var ray = world.map.raycast.Get(screen);
 		// var rayText = '[${ray.x.floor()}, ${ray.y.floor()}, ${ray.z.floor()}]';
 		// var terrainText = EnumValueTools.getName(ray.terrain);
 
@@ -57,10 +58,11 @@ class DebugInfoSystem extends System
 		debugInfo.fps.color = getFpsColor(fps).toHxdColor();
 
 		debugInfo.screenPos.text = 'screen=${screen} scale=${game.camera.scale}';
-		debugInfo.pixelPos.text = 'pixel=${pixel.format(0)}. ${worldToPix.format(0)}';
-		debugInfo.worldPos.text = 'world=${world.format(1)}';
+		debugInfo.pixelPos.text = 'pixel=${pixel.format(0)}. ${worldToPx.format(0)}';
+		debugInfo.worldPos.text = 'world=${wpos.format(1)}';
 
 		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
+		debugInfo.clock.text = '${ray.pos.format(1)} [${EnumValueTools.getName(ray.terrain)}])';
 		// debugInfo.clock.text = '${world.clock.friendlyString()} [${world.clock.tick}])';
 		debugInfo.drawCalls.text = 'draw ${game.app.engine.drawCalls}';
 	}
@@ -177,7 +179,7 @@ class DebugInfoSystem extends System
 			grid.lineTo(endPx.x, endPx.y);
 		}
 
-		// game.render(GROUND, grid);
+		game.render(GROUND, grid);
 
 		debugInfo = {
 			ob: ob,
