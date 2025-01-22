@@ -179,7 +179,7 @@ class DebugInfoSystem extends System
 			grid.lineTo(endPx.x, endPx.y);
 		}
 
-		game.render(GROUND, grid);
+		// game.render(GROUND, grid);
 
 		debugInfo = {
 			ob: ob,

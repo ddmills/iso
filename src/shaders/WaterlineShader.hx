@@ -24,12 +24,13 @@ class WaterlineShader extends Shader
 			function fragment()
 			{
 				var blockHeightPx = 10;
-				var water1 = vec3(66, 119, 135) / 255;
+				var water1 = vec3(35, 84, 101) / 255;
 				var foam = vec3(175, 226, 241) / 255;
 				var uv_in = input.uv;
 				var height_raw = heightTexture.get(uv_in).r;
-				var height = height_raw / 0.3137254902; // 0 to 80px high
-				// var height = height_raw / (); // 0 to 40px high
+
+				// normalize height to 1 = 1 block tall
+				var height = pos.z + (height_raw / 0.0392156863);
 
 				var shifted_uv = vec2(uv_in.x, uv_in.y + height);
 
@@ -44,19 +45,15 @@ class WaterlineShader extends Shader
 				var local = vec2(local_x, local_y);
 				var world = vec3(pos.x + local.x, pos.y + local.y, pos.z);
 
-				// pixelColor.g = local_x;
-				// pixelColor.r = local_y;
-				// pixelColor.b = height;
-
 				var y_wave_factor = 1.2;
-				var x_wave_factor = 0;
+				var x_wave_factor = 2;
 				var speed = 1;
 
 				var s = (sin((time * speed) + (world.x * x_wave_factor) + (world.y * y_wave_factor)) + 1) / 2; // 0,1
-				var nrm = s * .02; // between 0,0.1
-				var waterline = .21 - (s * .06);
+				var nrm = s * .5; // between 0,0.1
+				var waterline = 2.7 - nrm;
 				// var foamline = waterline + .015;
-				var foamline = waterline + .0175;
+				var foamline = waterline + .1;
 
 				if (height <= waterline)
 				{
@@ -72,7 +69,7 @@ class WaterlineShader extends Shader
 					var speed = 1;
 					// var s = (sin(time * speed + world.x + world.y) + 1) / 2; // 0,1
 
-					// pixelColor.rgb = mix(pixelColor.rgb, foam, .25);
+					pixelColor.rgb = mix(pixelColor.rgb, foam, .25);
 					pixelColor.rgb = mix(pixelColor.rgb, foam, (1 - s) * .4);
 				}
 

@@ -76,7 +76,7 @@ class MapGenerator
 		if (h < waterline + .03)
 		{
 			return {
-				terrain: STONE,
+				terrain: SAND,
 				tileHeight: 1,
 			};
 		}
@@ -84,7 +84,7 @@ class MapGenerator
 		if (h < waterline + .04)
 		{
 			return {
-				terrain: GRASS,
+				terrain: SAND,
 				tileHeight: 1,
 			};
 		}
