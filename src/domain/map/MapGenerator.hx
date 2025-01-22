@@ -60,7 +60,7 @@ class MapGenerator
 		if (h < waterline + .02)
 		{
 			return {
-				terrain: SAND,
+				terrain: STONE,
 				tileHeight: 0,
 			};
 		}

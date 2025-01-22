@@ -51,8 +51,8 @@ class WaterlineShader extends Shader
 
 				var s = (sin((time * speed) + (world.x * x_wave_factor) + (world.y * y_wave_factor)) + 1) / 2; // 0,1
 				var nrm = s * .5; // between 0,0.1
-				var waterline = 2.7 - nrm;
-				// var foamline = waterline + .015;
+				// var waterline = 2.7 - nrm;
+				var waterline = 1.8 - nrm;
 				var foamline = waterline + .1;
 
 				if (height <= waterline)
@@ -69,8 +69,8 @@ class WaterlineShader extends Shader
 					var speed = 1;
 					// var s = (sin(time * speed + world.x + world.y) + 1) / 2; // 0,1
 
-					pixelColor.rgb = mix(pixelColor.rgb, foam, .25);
-					pixelColor.rgb = mix(pixelColor.rgb, foam, (1 - s) * .4);
+					pixelColor.rgb = mix(pixelColor.rgb, foam, .7);
+					// pixelColor.rgb = mix(pixelColor.rgb, foam, (1 - s) * .4);
 				}
 
 				// pixelColor.rgb = vec3(0, 0, 0);
