@@ -14,6 +14,7 @@ enum RenderLayerType
 	ACTORS;
 	FX;
 	OVERLAY;
+	SCREENFX;
 	HUD;
 	POPUP;
 }
@@ -48,6 +49,7 @@ class RenderLayerManager
 		createLayer(ACTORS, WORLD);
 		createLayer(FX, WORLD);
 		createLayer(OVERLAY, WORLD);
+		createLayer(SCREENFX, SCREEN);
 		createLayer(HUD, SCREEN);
 		createLayer(POPUP, SCREEN);
 

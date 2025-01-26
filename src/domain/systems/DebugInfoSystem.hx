@@ -1,6 +1,7 @@
 package domain.systems;
 
 import common.struct.FloatPoint3;
+import common.tools.Performance;
 import common.util.Projection;
 import core.Frame;
 import data.Data;
@@ -54,6 +55,8 @@ class DebugInfoSystem extends System
 
 		// var w = Projection.screenToPx(game.input.screen);
 
+		var sort = Performance.toString('sort');
+
 		debugInfo.fps.text = game.app.engine.fps.floor().toString() + ' ' + frame.fps.floor().toString();
 		debugInfo.fps.color = getFpsColor(fps).toHxdColor();
 
@@ -61,7 +64,7 @@ class DebugInfoSystem extends System
 		debugInfo.pixelPos.text = 'pixel=${pixel.format(0)}. ${worldToPx.format(0)}';
 		debugInfo.worldPos.text = 'world=${wpos.format(1)}';
 
-		debugInfo.entities.text = 'entities ${game.registry.size.toString()}';
+		debugInfo.entities.text = 'entities ${game.registry.size.toString()}, iso ${world.ob.objects.length} ${sort} ';
 		debugInfo.clock.text = '${ray.pos.format(1)} [${EnumValueTools.getName(ray.terrain)}])';
 		// debugInfo.clock.text = '${world.clock.friendlyString()} [${world.clock.tick}])';
 		debugInfo.drawCalls.text = 'draw ${game.app.engine.drawCalls}';

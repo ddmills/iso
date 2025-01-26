@@ -12,13 +12,13 @@ import h2d.Bitmap;
 import h2d.Object;
 import hxsl.Types.Texture;
 import hxsl.Types.Vec;
-import shaders.WaterShader;
-import shaders.WaterlineShader;
+import shaders.SpriteShader;
 
 typedef RenderCell =
 {
 	iso:IsometricObject,
 	bm:Bitmap,
+	shader:SpriteShader,
 }
 
 class Chunk
@@ -29,7 +29,7 @@ class Chunk
 	public var worldPos(default, null):IntPoint;
 	public var chunkPos(default, null):IntPoint;
 
-	private var bitmaps:Array<Grid<RenderCell>>;
+	private var cells:Grid<RenderCell>;
 	private var size:Int;
 
 	private var texH1:Texture;
@@ -42,6 +42,7 @@ class Chunk
 		this.chunkIdx = chunkIdx;
 		this.map = map;
 		this.size = map.chunkSize;
+
 		texH1 = hxd.Res.tiles.terrain_depth_1.toTexture();
 		texH1.filter = Nearest;
 		texH2 = hxd.Res.tiles.terrain_depth_2.toTexture();
@@ -58,13 +59,7 @@ class Chunk
 		worldPos = chunkPos.multiply(map.chunkSize);
 
 		isLoaded = false;
-		bitmaps = [];
-
-		for (x in 0...map.depth)
-		{
-			var g = new Grid<RenderCell>(map.width, map.height);
-			bitmaps.push(g);
-		}
+		cells = new Grid<RenderCell>(map.width, map.height);
 	}
 
 	public function load()
@@ -114,27 +109,15 @@ class Chunk
 
 	public function updateTerrainBm(wx:Int, wy:Int)
 	{
+		var world = Game.instance.world;
 		var t = map.get(wx, wy);
 
-		if (t.terrain == EMPTY)
-		{
-			for (z in 0...map.depth)
-			{
-				// bitmaps[z].get(wx, wy)?.iso.ob.remove();
-				// bitmaps[z].set(wx, wy, null);
-			}
-
-			return;
-		}
-
-		if (t.terrain == WATER)
+		if (t.terrain == EMPTY || t.terrain == WATER)
 		{
 			return;
 		}
 
-		// for (z in 0...(t.height + 1))
-		// {
-		var cell = bitmaps[0].get(wx, wy);
+		var cell = cells.get(wx, wy);
 
 		if (cell == null)
 		{
@@ -143,7 +126,6 @@ class Chunk
 			var bm = new Bitmap(tile);
 			var ob = new Object();
 			bm.x = -(tile.width * .5);
-			// bm.y = -(MapData.TILE_H * .75);
 			bm.y = -(tile.height * .8625);
 			ob.addChild(bm);
 
@@ -151,42 +133,20 @@ class Chunk
 			block.pos = new FloatPoint3(wx + .5, wy + .5, 0);
 			block.size = new FloatPoint3(1, 1, t.height + 1);
 
+			var shader = new SpriteShader();
+			shader.heightTexture = getHeightTexture(t.height + 1);
+			shader.pos = new Vec(wx + .5, wy + .5, 0);
+			bm.addShader(shader);
+
 			cell = {
 				iso: block,
 				bm: bm,
+				shader: shader,
 			};
 
-			map.ob.add(block);
-
-			bitmaps[0].set(wx, wy, cell);
+			world.ob.add(block);
+			cells.set(wx, wy, cell);
 		}
-
-		// var tk = getTileKey(t.terrain);
-		// var tile = Data.Tiles.get(tk);
-		// cell.bm.tile = tile;
-
-		if (t.terrain == WATER)
-		{
-			// var shader = new WaterShader();
-			// shader.wpos = new Vec(wx, wy, z);
-			// cell.bm.addShader(shader);
-		}
-		else
-		{
-			var shader = cell.bm.getShader(WaterShader);
-
-			if (shader != null)
-			{
-				cell.bm.removeShader(shader);
-			}
-
-			var shader = new WaterlineShader();
-			shader.pos = new Vec(wx + .5, wy + .5, 0);
-			shader.size = new Vec(1, 1, t.height + 1);
-			shader.heightTexture = getHeightTexture(t.height + 1);
-			cell.bm.addShader(shader);
-		}
-		// }
 	}
 
 	private function getHeightTexture(height:Int):Texture

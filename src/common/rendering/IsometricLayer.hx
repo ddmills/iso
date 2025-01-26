@@ -1,23 +1,23 @@
 package common.rendering;
 
 import common.util.Projection;
-import domain.map.MapData;
 import h2d.Object;
+import haxe.exceptions.NotImplementedException;
 
 class IsometricLayer extends Object
 {
-	private var isoObjects:Array<IsometricObject>;
+	public var objects:Array<IsometricObject>;
 
-	public function new(map:MapData)
+	public function new()
 	{
 		super();
-		isoObjects = new Array();
+		objects = new Array();
 	}
 
 	public function add(iso:IsometricObject)
 	{
 		var idx = children.length;
-		isoObjects.push(iso);
+		objects.push(iso);
 		addChildAt(iso.ob, idx);
 
 		var px = Projection.worldToPx(iso.pos);
@@ -43,34 +43,10 @@ class IsometricLayer extends Object
 		return overlap(a, b) && (a.x + a.xx <= b.x || a.y + a.yy <= b.y || a.z + a.zz <= b.z);
 	}
 
-	// override function removeChild(s:Object)
-	// {
-	// 	for (i in 0...isoObjects.length)
-	// 	{
-	// 		if (children[i] == s)
-	// 		{
-	// 			children.splice(i, 1);
-	// 			if (s.allocated)
-	// 				s.onRemove();
-	// 			s.parent = null;
-	// 			s.posChanged = true;
-	// 			if (s.parentContainer != null)
-	// 				s.setParentContainer(null);
-	// 			var k = layerCount - 1;
-	// 			while (k >= 0 && layersIndexes[k] > i)
-	// 			{
-	// 				layersIndexes[k]--;
-	// 				k--;
-	// 			}
-	// 			#if domkit
-	// 			if (s.dom != null)
-	// 				s.dom.onParentChanged();
-	// 			#end
-	// 			onContentChanged();
-	// 			break;
-	// 		}
-	// 	}
-	// }
+	override function removeChild(s:Object)
+	{
+		throw new NotImplementedException();
+	}
 
 	public function sort()
 	{
@@ -80,7 +56,7 @@ class IsometricLayer extends Object
 			var newPivot = false;
 			for (i in pivot...children.length)
 			{
-				var obj = isoObjects[i];
+				var obj = objects[i];
 				var parent = true;
 				for (j in pivot...children.length)
 				{
@@ -89,7 +65,7 @@ class IsometricLayer extends Object
 						continue;
 					}
 
-					var obj2 = isoObjects[j];
+					var obj2 = objects[j];
 					if (isBehind(obj2, obj))
 					{
 						parent = false;
@@ -99,8 +75,8 @@ class IsometricLayer extends Object
 
 				if (parent)
 				{
-					isoObjects[i] = isoObjects[pivot];
-					isoObjects[pivot] = obj;
+					objects[i] = objects[pivot];
+					objects[pivot] = obj;
 					var child = children[i];
 					children[i] = children[pivot];
 					children[pivot] = child;
@@ -114,48 +90,4 @@ class IsometricLayer extends Object
 			}
 		}
 	}
-
-	// public function sort()
-	// {
-	// 	var startIdx = 0;
-	// 	var maxIdx = isoObjects.length;
-	// 	if (startIdx == maxIdx)
-	// 	{
-	// 		return;
-	// 	}
-	// 	var idx = startIdx;
-	// 	var ymax = isoObjects[idx++];
-	// 	while (idx < maxIdx)
-	// 	{
-	// 		var o1 = isoObjects[idx];
-	// 		if (isBehind(o1, ymax))
-	// 		{
-	// 			var p = idx - 1;
-	// 			while (p >= startIdx)
-	// 			{
-	// 				var o2 = isoObjects[p];
-	// 				if (isBehind(o2, o1))
-	// 				{
-	// 					break;
-	// 				}
-	// 				trace('swap?');
-	// 				isoObjects[p + 1] = o2;
-	// 				children[p + 1] = o2.ob;
-	// 				p--;
-	// 			}
-	// 			isoObjects[p + 1] = o1;
-	// 			children[p + 1] = o1.ob;
-	// 			trace('swap');
-	// 			if (o1.ob.allocated)
-	// 			{
-	// 				o1.ob.onHierarchyMoved(false);
-	// 			}
-	// 		}
-	// 		else
-	// 		{
-	// 			ymax = o1;
-	// 		}
-	// 		idx++;
-	// 	}
-	// }
 }

@@ -10,6 +10,8 @@ import domain.World;
 import ecs.Registry;
 import h2d.Console;
 import hxd.Window;
+import hxsl.ShaderList;
+import shaders.BaseShader;
 
 class Game
 {
@@ -56,6 +58,18 @@ class Game
 		registry = new Registry();
 
 		ConsoleConfig.Config(console);
+
+		app.s2d.renderer.globals.set("renderHeight", false);
+
+		@:privateAccess {
+			var baseShader = new BaseShader();
+			baseShader.setPriority(80);
+			app.s2d.renderer.baseShader = baseShader;
+			app.s2d.renderer.baseShaderList = new ShaderList(baseShader);
+			app.s2d.renderer.baseShaderList.next = null;
+			app.s2d.renderer.output.setOutput();
+			app.s2d.renderer.initShaders(app.s2d.renderer.baseShaderList);
+		}
 
 		app.s2d.scaleMode = Fixed(800, 600, 1, Left, Top);
 		app.s2d.addChild(layers.root);

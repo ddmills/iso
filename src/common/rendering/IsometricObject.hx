@@ -7,49 +7,47 @@ class IsometricObject
 	public var ob(default, null):h2d.Object;
 	public var idx:Int;
 
-	public var pos:FloatPoint3;
-	public var size:FloatPoint3;
+	public var pos(get, set):FloatPoint3;
+	public var size(get, set):FloatPoint3;
 
-	public var x(get, never):Float;
-	public var y(get, never):Float;
-	public var z(get, never):Float;
+	public var x(default, default):Float;
+	public var y(default, default):Float;
+	public var z(default, default):Float;
 
-	public var xx(get, never):Float;
-	public var yy(get, never):Float;
-	public var zz(get, never):Float;
+	public var xx(default, default):Float;
+	public var yy(default, default):Float;
+	public var zz(default, default):Float;
 
 	public function new(ob:h2d.Object)
 	{
 		this.ob = ob;
 	}
 
-	inline function get_x():Float
+	inline function get_pos():FloatPoint3
 	{
-		return pos.x;
+		return new FloatPoint3(x, y, z);
 	}
 
-	inline function get_y():Float
+	inline function set_pos(v:FloatPoint3)
 	{
-		return pos.y;
+		x = v.x;
+		y = v.y;
+		z = v.z;
+
+		return v;
 	}
 
-	inline function get_z():Float
+	inline function set_size(v:FloatPoint3):FloatPoint3
 	{
-		return pos.z;
+		xx = v.x;
+		yy = v.y;
+		zz = v.z;
+
+		return v;
 	}
 
-	inline function get_xx():Float
+	inline function get_size():FloatPoint3
 	{
-		return size.x;
-	}
-
-	inline function get_yy():Float
-	{
-		return size.y;
-	}
-
-	inline function get_zz():Float
-	{
-		return size.z;
+		return new FloatPoint3(xx, yy, zz);
 	}
 }

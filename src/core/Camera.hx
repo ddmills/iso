@@ -26,7 +26,8 @@ class Camera
 
 	public function new()
 	{
-		scale = 1;
+		scale = 2;
+		Game.instance.app.s2d.renderer.globals.set("cameraScale", scale);
 	}
 
 	inline function get_width():Float
@@ -67,6 +68,7 @@ class Camera
 	function set_scale(value:Float):Float
 	{
 		scroller.setScale(value);
+		Game.instance.app.s2d.renderer.globals.set("cameraScale", scale);
 
 		return value;
 	}

@@ -17,13 +17,21 @@ import domain.systems.EnergySystem;
 import ecs.Entity;
 import h2d.Bitmap;
 import h2d.Object;
+import h2d.Tile;
+import h2d.filter.Shader;
+import hxd.Key;
+import hxsl.Types.Texture;
 import screens.console.ConsoleScreen;
 import screens.save.SaveScreen;
+import shaders.OutlineScreenShader;
 import shaders.WaterlineShader;
 
 class PlayScreen extends Screen
 {
 	var cursor:Entity;
+	var sceneHeightTexture:Texture;
+	var overlay:Bitmap;
+	var outlineOverlay:Bitmap;
 
 	private var cursorPos:FloatPoint3;
 
@@ -34,8 +42,33 @@ class PlayScreen extends Screen
 		inputDomain = INPUT_DOMAIN_PLAY;
 		cursor = Prefab.Spawn(CURSOR);
 		// world.input.camera.followEntity(world.player.ship);
-		var layer = world.map.ob;
-		game.render(GROUND, layer);
+		game.render(GROUND, world.ob);
+
+		var window = game.window;
+
+		// create a new texture to render height data into
+		sceneHeightTexture = new Texture(window.width, window.height, [Target]);
+		sceneHeightTexture.filter = Nearest;
+		sceneHeightTexture.clear(0);
+
+		overlay = new Bitmap(Tile.fromTexture(sceneHeightTexture));
+		outlineOverlay = new Bitmap(Tile.fromColor(0, window.width, window.height, 0));
+
+		var outline = new OutlineScreenShader();
+
+		outline.heightTexture = sceneHeightTexture;
+		outline.pad = 3;
+		outlineOverlay.filter = new Shader<OutlineScreenShader>(outline);
+		outlineOverlay.visible = false;
+
+		window.addResizeEvent(() ->
+		{
+			sceneHeightTexture.resize(window.width, window.height);
+			overlay.width = window.width;
+			overlay.height = window.height;
+		});
+		game.render(HUD, overlay);
+		game.render(SCREENFX, outlineOverlay);
 	}
 
 	function makeBlock(pos:FloatPoint3, layer:IsometricLayer):IsometricObject
@@ -78,6 +111,15 @@ class PlayScreen extends Screen
 
 	override function update(frame:Frame)
 	{
+		sceneHeightTexture.clear(0);
+		overlay.visible = false;
+		outlineOverlay.filter.enable = false;
+		game.app.s2d.renderer.globals.set("renderHeight", 1);
+		game.app.s2d.drawTo(sceneHeightTexture);
+		game.app.s2d.renderer.globals.set("renderHeight", 0);
+		overlay.visible = hxd.Key.isDown(Key.SPACE);
+		outlineOverlay.filter.enable = !overlay.visible;
+
 		world.updateSystems();
 
 		world.input.camera.update();
@@ -117,13 +159,13 @@ class PlayScreen extends Screen
 		{
 			var r = world.map.raycast.Get(game.input.mouse);
 			trace('raycast!', r.pos.floor());
-			makeBlock(r.pos.floor(), world.map.ob);
+			makeBlock(r.pos.floor(), world.ob);
 		}
 
 		if (game.input.rmb)
 		{
 			Performance.start('sort');
-			world.map.ob.sort();
+			world.ob.sort();
 			Performance.stop('sort', true);
 		}
 

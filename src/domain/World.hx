@@ -1,5 +1,6 @@
 package domain;
 
+import common.rendering.IsometricLayer;
 import common.struct.FloatPoint3;
 import common.tools.Performance;
 import core.Game;
@@ -29,6 +30,7 @@ class World
 	public var seed:Int = 2;
 	public var rand:Rand;
 	public var input:InputGroups;
+	public var ob:IsometricLayer;
 
 	public function new()
 	{
@@ -38,6 +40,7 @@ class World
 		ai = new AIManager();
 		input = new InputGroups();
 		map = new MapData();
+		ob = new IsometricLayer();
 	}
 
 	public function initialize()
@@ -65,7 +68,8 @@ class World
 
 	public function generateMap()
 	{
-		map?.ob.remove();
+		ob.remove();
+		ob = new IsometricLayer();
 		map = new MapData();
 
 		var gen = new MapGenerator();
@@ -73,7 +77,7 @@ class World
 			seed: seed
 		});
 
-		game.render(GROUND, map.ob);
+		game.render(GROUND, ob);
 	}
 
 	public function load(data:WorldSave)
